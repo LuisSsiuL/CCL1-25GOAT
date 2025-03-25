@@ -45,7 +45,10 @@ struct ContentView: View {
         
         }
     }
-
-#Preview {
-    ContentView()
-}
+//<<<<<<< HEAD
+//=======
+//
+//#Preview {
+//    ContentView()
+//>>>>>>> 0b8c0968aee3fcdfec938602d969c86b42659491
+//}

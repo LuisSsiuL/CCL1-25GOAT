@@ -11,7 +11,7 @@ import SwiftUI
 struct CCL1_25GOATApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            DashboardView()
         }
     }
 }
