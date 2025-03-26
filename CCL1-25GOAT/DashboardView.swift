@@ -1,44 +1,76 @@
 import SwiftUI
 import SwiftData
 
-struct Entries {
-    var category: String,
-        time: Date,
-        image: Data?,
-        note: String?
-    var formattedDate: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd MMM yyyy"
-        return formatter.string(from: time)
-       }
+//<<<<<<< Updated upstream
+//struct Entries {
+//    var category: String,
+//        time: Date,
+//        image: Data?,
+//        note: String?
+//    var formattedDate: String {
+//        let formatter = DateFormatter()
+//        formatter.dateFormat = "dd MMM yyyy"
+//        return formatter.string(from: time)
+//       }
+//    
+//}
+//
+//struct Cars {
+//    var plate: String,
+//        type: String,
+//        entries: [Entries]
+//=======
+struct GroupedCarList: View {
+//>>>>>>> Stashed changes
     
-}
-
-struct Cars {
-    var plate: String,
-        type: String,
-        entries: [Entries]
+    let car: [Car]
     
-    var mostRecentDate: Date {
-        entries.max(by: { $0.time < $1.time })?.time ?? Date()
-    }
-    var groupedEntries: [String: [Entries]] {
-            Dictionary(grouping: entries, by: { $0.formattedDate })
-                .mapValues { $0.sorted(by: { $0.time > $1.time }) } // Sort by most recent first
+    private var groupedCar: [Date: [Car]] {
+        Dictionary(grouping: car) { car in
+            Calendar.current.startOfDay(for: car.mostRecentEntry)
         }
+    }
+    
+    private var sectionDates: [Date] {
+        groupedCar.keys.sorted(by: >) // sorts by newest first
+    }
+    
+    var body: some View {
+        List {
+            ForEach(sectionDates, id: \.self) { date in
+                Section(header: sectionHeader(for: date)) {
+                    ForEach(self.groupedCar[date] ?? []) { car in
+                        NavigationLink {
+                            VehicleDetailView(plate: car.plate)
+                        } label: {
+                            DashboardCard(cars: car, entry: car.entry)
+                        }
+                    }
+                }
+            }
+        }.listStyle(GroupedListStyle())
+    }
+    
+    private func sectionHeader(for date: Date) -> some View {
+        HStack {
+            Text(date.formatted(.dateTime.day().month().year())).font(.caption)
+            Spacer()
+        }
+    }
 }
 
 struct DashboardCard: View {
     
-    let cars: Cars
-    let entries: [Entries]
+    //struct ver
+    let cars: Car
+    let entry: [Entry]
     
     var body: some View {
         HStack {
             Image(systemName: cars.type == "Car" ? "car.side.fill" : "motorcycle.fill").foregroundStyle(.secondary)
             Text(cars.plate)
             Spacer()
-            Text(cars.mostRecentDate, format: .dateTime.hour().minute()).foregroundStyle(.secondary)
+            Text(cars.mostRecentEntry, format: .dateTime.hour().minute()).foregroundStyle(.secondary)
         }
     }
 }
@@ -46,13 +78,15 @@ struct DashboardCard: View {
 struct DashboardView: View {
     
     @State private var cars = [
-        Cars(plate: "ABC123", type: "Car", entries: [Entries(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2021, month: 7, day: 28, hour: 7, minute: 30))!,image: nil, note: "kaca spion pecah"), Entries(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2021, month: 7, day: 27, hour: 7, minute: 45))!,image: nil, note: "kaca spion pecah")]),
-        Cars(plate: "DEF456", type: "Bike", entries: [Entries(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2021, month: 7, day: 28, hour: 8, minute: 30))!,image: nil, note: "spion kanan hilang")]),
-        Cars(plate: "GHI789", type: "Car", entries: [Entries(category: "Body", time: Calendar.current.date(from: DateComponents(year: 2021, month: 7, day: 28, hour: 9, minute: 30))!,image: nil, note: "panel pintu lecet")]),
-        Cars(plate: "JKL012", type: "Bike", entries: [Entries(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2021, month: 7, day: 28, hour: 10, minute: 30))!,image: nil, note: "spion kiri hilang")]),
+        Car(plate: "ABC123", type: "Car", entry: [Entry(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2024, month: 7, day: 28, hour: 7, minute: 30))!, note: "kaca spion pecah"), Entry(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2024, month: 7, day: 27, hour: 7, minute: 45))!, note: "kaca spion pecah")]),
+        Car(plate: "DEF456", type: "Bike", entry: [Entry(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2024, month: 7, day: 27, hour: 8, minute: 30))!, note: "spion kanan hilang")]),
+        Car(plate: "GHI789", type: "Car", entry: [Entry(category: "Body", time: Calendar.current.date(from: DateComponents(year: 2024, month: 7, day: 20, hour: 9, minute: 30))!, note: "panel pintu lecet")]),
+        Car(plate: "JKL012", type: "Bike", entry: [Entry(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2024, month: 7, day: 28, hour: 10, minute: 30))!, note: "spion kiri hilang")]),
+        Car(plate: "MNO993", type: "Bike", entry: [Entry(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2024, month: 7, day: 25, hour: 10, minute: 30))!, note: "spion kiri hilang"), Entry(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2024, month: 7, day: 29, hour: 10, minute: 30))!, note: "spion kiri hilang")]),
+//>>>>>>> Stashed changes
     ]
     
-    var carsSearch: [Cars] {
+    var carsSearch: [Car] {
         guard !searchText.isEmpty else {
             return cars
         }
@@ -69,24 +103,34 @@ struct DashboardView: View {
             
             VStack {
                 HStack {
-                    Text("List Hari Ini").font(.largeTitle).fontWeight(.bold)
+                    Text("Kendaraan Baru").font(.largeTitle).fontWeight(.bold)
                     Spacer()
                 }.padding(.horizontal).padding(.top)
                 
-                HStack { // ??changeable
-                    Text(Date(), style: .date)
-                    Spacer()
-                }.padding(.horizontal)
+//                List(carsSearch, id: \.plate) { car in
+//                    NavigationLink {
+//                        //navigate to detail page of clicked list
+//                        VehicleDetailView(plate: car.plate)
+//                    } label: {
+//                        DashboardCard(cars: car, entry: car.entry)
+//                    }
+//                }.scrollContentBackground(.hidden)
+//                    .searchable(text: $searchText, placement: .navigationBarDrawer)
                 
-                List(carsSearch, id: \.plate) { car in
-                    NavigationLink {
-                        //navigate to detail page of clicked list
-                        VehicleDetailView(vehicle: car)
-                    } label: {
-                        DashboardCard(cars: car, entries: car.entries)
-                    }
-                }.scrollContentBackground(.hidden)
-                    .searchable(text: $searchText, placement: .navigationBarDrawer)
+                GroupedCarList(car: carsSearch).scrollContentBackground(.hidden).searchable(text: $searchText, placement: .navigationBarDrawer)
+                
+//<<<<<<< Updated upstream
+//                List(carsSearch, id: \.plate) { car in
+//                    NavigationLink {
+//                        //navigate to detail page of clicked list
+//                        VehicleDetailView(vehicle: car)
+//                    } label: {
+//                        DashboardCard(cars: car, entries: car.entries)
+//                    }
+//                }.scrollContentBackground(.hidden)
+//                    .searchable(text: $searchText, placement: .navigationBarDrawer)
+//=======
+//>>>>>>> Stashed changes
                 // APPLY SWIPE ACTION HERE
                 
             }.background(.ultraThinMaterial)                .navigationBarTitleDisplayMode(.inline)
