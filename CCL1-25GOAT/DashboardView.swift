@@ -1,32 +1,45 @@
 import SwiftUI
+import SwiftData
+
+struct Entries {
+    var category: String,
+        time: Date,
+        image: Data?,
+        note: String?
+}
 
 struct Cars {
     var plate: String,
         type: String,
-        time: Date
+        entries: [Entries]
+    
+    var mostRecentDate: Date {
+        entries.max(by: { $0.time < $1.time })?.time ?? Date()
+    }
 }
 
 struct DashboardCard: View {
+    
     let cars: Cars
+    let entries: [Entries]
+    
     var body: some View {
         HStack {
             Image(systemName: cars.type == "Car" ? "car.side.fill" : "motorcycle.fill").foregroundStyle(.secondary)
             Text(cars.plate)
             Spacer()
-            Text("12:30").foregroundStyle(.secondary)
-//            Image(systemName: "chevron.right")
+            Text(cars.mostRecentDate, format: .dateTime.hour().minute()).foregroundStyle(.secondary)
         }
-//        .padding().background(Color.gray.opacity(0.1))
     }
 }
 
 struct DashboardView: View {
     
     @State private var cars = [
-        Cars(plate: "ABC123", type: "Car", time: Date().addingTimeInterval(-3600)),
-        Cars(plate: "XYZ789", type: "Bike", time: Date().addingTimeInterval(-1800)),
-        Cars(plate: "DEF456", type: "Car", time: Date().addingTimeInterval(-900)),
-        Cars(plate: "DEF456", type: "Car", time: Date().addingTimeInterval(-900)),
+        Cars(plate: "ABC123", type: "Car", entries: [Entries(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2021, month: 7, day: 28, hour: 7, minute: 30))!,image: nil, note: "kaca spion pecah"), Entries(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2021, month: 7, day: 28, hour: 7, minute: 45))!,image: nil, note: "kaca spion pecah")]),
+        Cars(plate: "DEF456", type: "Bike", entries: [Entries(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2021, month: 7, day: 28, hour: 8, minute: 30))!,image: nil, note: "spion kanan hilang")]),
+        Cars(plate: "GHI789", type: "Car", entries: [Entries(category: "Body", time: Calendar.current.date(from: DateComponents(year: 2021, month: 7, day: 28, hour: 9, minute: 30))!,image: nil, note: "panel pintu lecet")]),
+        Cars(plate: "JKL012", type: "Bike", entries: [Entries(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2021, month: 7, day: 28, hour: 10, minute: 30))!,image: nil, note: "spion kiri hilang")]),
     ]
     
     var carsSearch: [Cars] {
@@ -41,6 +54,7 @@ struct DashboardView: View {
     @State var searchText: String = ""
     
     var body: some View {
+        
         NavigationStack {
             
             VStack {
@@ -59,15 +73,14 @@ struct DashboardView: View {
                         //navigate to detail page of clicked list
                         VehicleDetailView(plate: car.plate)
                     } label: {
-                        DashboardCard(cars: car)
+                        DashboardCard(cars: car, entries: car.entries)
                     }
                 }.scrollContentBackground(.hidden)
                     .searchable(text: $searchText, placement: .navigationBarDrawer)
+                // APPLY SWIPE ACTION HERE
                 
-            }.background(.ultraThinMaterial)
-                .navigationBarTitleDisplayMode(.inline) // gets rid of spacing below title
-            // need to change to actual background color
-            .toolbar {
+            }.background(.ultraThinMaterial)                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("Welcome").font(.system(size: 20, weight: .bold, design: .default))
                 }

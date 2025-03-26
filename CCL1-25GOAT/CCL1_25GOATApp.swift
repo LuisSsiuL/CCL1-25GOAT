@@ -1,11 +1,18 @@
-//
-//  CCL1_25GOATApp.swift
-//  CCL1-25GOAT
-//
-//  Created by Christian Luis Efendy on 24/03/25.
-//
-
 import SwiftUI
+import SwiftData
+
+@Model
+final class Car {
+    var plate: String
+    var type: String
+    var time: Date
+    
+    init(plate: String, type: String, time: Date) {
+        self.plate = plate
+        self.type = type
+        self.time = time
+    }
+}
 
 @main
 struct CCL1_25GOATApp: App {
@@ -13,5 +20,7 @@ struct CCL1_25GOATApp: App {
         WindowGroup {
             DashboardView()
         }
+        // SwiftData container setup
+        .modelContainer(for: Car.self)
     }
 }
