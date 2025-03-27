@@ -79,6 +79,23 @@ struct GroupedEntryView: View {
                     } label: {
                         VehicleDetailCard(entry: entry)
                     }
+                    .swipeActions(edge: .leading) {
+                        Button(role: .cancel) {
+                                    print("Delete tapped")
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+
+                        }
+                            }
+                    .swipeActions(edge: .trailing) {
+
+                                Button(role: .destructive) {
+                                    print("Delete tapped")
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                }
+                    
                 }
             }
         )
@@ -123,39 +140,6 @@ struct VehicleDetailView: View {
     var body: some View {
             
             GroupedEntryView(entry: vehicle.entry)
-//            List {
-//                ForEach(vehicle.groupedEntries.keys.sorted(by: { $0 > $1 }), id: \.self) { date in
-//                    Section(header: Text(date).font(.headline)) {
-//                        ForEach(vehicle.groupedEntries[date] ?? [], id: \.time) { entry in
-//                            
-//                            VehicleDetailCard(entry: entry)
-//                                .swipeActions(edge: .leading) {
-//                                    Button(role: .cancel) {
-//                                                print("Delete tapped")
-//                                    } label: {
-//                                        Label("Edit", systemImage: "pencil")
-//                                            
-//                                    }
-//                                        }
-//                            
-//                                .swipeActions(edge: .trailing) {
-//                                    
-//                                            Button(role: .destructive) {
-//                                                print("Delete tapped")
-//                                            } label: {
-//                                                Label("Delete", systemImage: "trash")
-//                                            }
-//                                    
-//                                
-//                                }
-//                                
-//
-//                                                    
-//                            .padding(.vertical, 4)
-//                        }
-//                    }
-//                }
-//            }
             .searchable(text: $searchText, prompt: "Search categories" )
             .padding(.top)
             

@@ -1,25 +1,6 @@
 import SwiftUI
 import SwiftData
 
-//<<<<<<< Updated upstream
-//struct Entries {
-//    var category: String,
-//        time: Date,
-//        image: Data?,
-//        note: String?
-//    var formattedDate: String {
-//        let formatter = DateFormatter()
-//        formatter.dateFormat = "dd MMM yyyy"
-//        return formatter.string(from: time)
-//       }
-//
-//}
-//
-//struct Cars {
-//    var plate: String,
-//        type: String,
-//        entries: [Entries]
-//=======
 struct GroupedCarList: View {
     
     let car: [Car]
@@ -117,31 +98,9 @@ struct DashboardView: View {
                     Text("Kendaraan Baru").font(.largeTitle).fontWeight(.bold)
                     Spacer()
                 }.padding(.horizontal).padding(.top)
-                
-//                List(carsSearch, id: \.plate) { car in
-//                    NavigationLink {
-//                        //navigate to detail page of clicked list
-//                        VehicleDetailView(plate: car.plate)
-//                    } label: {
-//                        DashboardCard(cars: car, entry: car.entry)
-//                    }
-//                }.scrollContentBackground(.hidden)
-//                    .searchable(text: $searchText, placement: .navigationBarDrawer)
-                
+
                 GroupedCarList(car: carsSearch).scrollContentBackground(.hidden).searchable(text: $searchText, placement: .navigationBarDrawer)
-                
-//<<<<<<< Updated upstream
-//                List(carsSearch, id: \.plate) { car in
-//                    NavigationLink {
-//                        //navigate to detail page of clicked list
-//                        VehicleDetailView(vehicle: car)
-//                    } label: {
-//                        DashboardCard(cars: car, entries: car.entries)
-//                    }
-//                }.scrollContentBackground(.hidden)
-//                    .searchable(text: $searchText, placement: .navigationBarDrawer)
-//=======
-//>>>>>>> Stashed changes
+
                 // APPLY SWIPE ACTION HERE
                 
             }.background(.ultraThinMaterial)                .navigationBarTitleDisplayMode(.inline)
