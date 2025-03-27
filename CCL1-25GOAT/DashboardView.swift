@@ -6,6 +6,12 @@ struct Entries {
         time: Date,
         image: Data?,
         note: String?
+    var formattedDate: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd MMM yyyy"
+        return formatter.string(from: time)
+       }
+    
 }
 
 struct Cars {
@@ -16,6 +22,10 @@ struct Cars {
     var mostRecentDate: Date {
         entries.max(by: { $0.time < $1.time })?.time ?? Date()
     }
+    var groupedEntries: [String: [Entries]] {
+            Dictionary(grouping: entries, by: { $0.formattedDate })
+                .mapValues { $0.sorted(by: { $0.time > $1.time }) } // Sort by most recent first
+        }
 }
 
 struct DashboardCard: View {
@@ -36,7 +46,7 @@ struct DashboardCard: View {
 struct DashboardView: View {
     
     @State private var cars = [
-        Cars(plate: "ABC123", type: "Car", entries: [Entries(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2021, month: 7, day: 28, hour: 7, minute: 30))!,image: nil, note: "kaca spion pecah"), Entries(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2021, month: 7, day: 28, hour: 7, minute: 45))!,image: nil, note: "kaca spion pecah")]),
+        Cars(plate: "ABC123", type: "Car", entries: [Entries(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2021, month: 7, day: 28, hour: 7, minute: 30))!,image: nil, note: "kaca spion pecah"), Entries(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2021, month: 7, day: 27, hour: 7, minute: 45))!,image: nil, note: "kaca spion pecah")]),
         Cars(plate: "DEF456", type: "Bike", entries: [Entries(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2021, month: 7, day: 28, hour: 8, minute: 30))!,image: nil, note: "spion kanan hilang")]),
         Cars(plate: "GHI789", type: "Car", entries: [Entries(category: "Body", time: Calendar.current.date(from: DateComponents(year: 2021, month: 7, day: 28, hour: 9, minute: 30))!,image: nil, note: "panel pintu lecet")]),
         Cars(plate: "JKL012", type: "Bike", entries: [Entries(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2021, month: 7, day: 28, hour: 10, minute: 30))!,image: nil, note: "spion kiri hilang")]),
@@ -71,7 +81,7 @@ struct DashboardView: View {
                 List(carsSearch, id: \.plate) { car in
                     NavigationLink {
                         //navigate to detail page of clicked list
-                        VehicleDetailView(plate: car.plate)
+                        VehicleDetailView(vehicle: car)
                     } label: {
                         DashboardCard(cars: car, entries: car.entries)
                     }

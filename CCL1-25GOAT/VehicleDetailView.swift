@@ -1,26 +1,7 @@
 import SwiftUI
 
-struct VehicleDetailView : View {
+struct VehicleDetailCard: View {
     
-<<<<<<< Updated upstream
-    let plate: String
-    
-    var body: some View {
-            
-        VStack {
-            Text("Vehicle Detail View").font(.headline)
-        }.background(.ultraThinMaterial)
-            .navigationBarTitleDisplayMode(.inline) // gets rid of spacing below title
-        // need to change to actual background color
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Button {
-                    
-                } label: {
-                    HStack {
-                        Text(plate).font(.system(size: 20, weight: .bold, design: .default)).foregroundStyle(.white)
-                        Image(systemName: "pencil")
-=======
     let entry: Entries
 
     var body: some View {
@@ -156,7 +137,6 @@ struct VehicleDetailView: View {
                                                 .frame(width: 330, height: 36, alignment: .center)
                                                 .background(Color.blue)
                                                 .containerShape(RoundedRectangle(cornerSize: .init(width: 10, height: 10)))
->>>>>>> Stashed changes
                     }
                 }
             }
@@ -164,20 +144,6 @@ struct VehicleDetailView: View {
                 FilterView(startDate: $startDate, endDate: $endDate)
                     .presentationDetents([.fraction(0.4)])
             
-<<<<<<< Updated upstream
-            ToolbarItem(placement: .bottomBar) {
-                Button {
-                    
-                } label: {
-                    Text("+ Add New Note").font(.system(size: 19, weight: .bold, design: .default))
-                        .foregroundStyle(.white)
-                        .frame(width: 330, height: 36, alignment: .center)
-                        .background(Color.blue)
-                        .containerShape(RoundedRectangle(cornerSize: .init(width: 10, height: 10)))
-                }
-            }
-        }.toolbarBackground(.visible, for: .navigationBar)
-=======
         }
             .sheet(isPresented: $showEditSheet) {
                 VehicleEditView(plateNumber: $plateNumber)
@@ -191,10 +157,11 @@ struct VehicleDetailView: View {
                 DeleteConfirmationView()
                     .presentationDetents([.fraction(0.2)])
             }
->>>>>>> Stashed changes
     }
 }
 
 #Preview {
+    
     DashboardView()
+    
 }
