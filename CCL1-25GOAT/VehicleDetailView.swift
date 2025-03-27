@@ -2,7 +2,7 @@ import SwiftUI
 
 struct VehicleDetailCard: View {
     
-    let entry: Entries
+    let entry: Entry
 
     var body: some View {
         HStack {
@@ -17,8 +17,8 @@ struct VehicleDetailCard: View {
                 Text(entry.category)
                     .font(.subheadline)
                     .bold()
-                if let note = entry.note {
-                    Text(note)
+                if !entry.note.isEmpty {
+                    Text(entry.note)
                         .font(.body)
                         .foregroundColor(.gray)
                 }
@@ -29,9 +29,73 @@ struct VehicleDetailCard: View {
         }
     }
 }
+private func DeleteButton(for entry: Entry) -> some View {
+    Button(role: .destructive) {
+        print("Delete tapped")
+    } label: {
+        Label("Delete", systemImage: "trash")
+    }
+}
+
+private func EditButton(for entry: Entry) -> some View {
+    Button(role: .cancel) {
+        print("Delete tapped")
+    } label: {
+        Label("Edit", systemImage: "pencil")
+    }
+}
+
+struct GroupedEntryView: View {
+    
+    let entry: [Entry]
+    
+    private var groupedEntries: [Date: [Entry]] {
+        Dictionary(grouping: entry) { entry in
+            Calendar.current.startOfDay(for: entry.time)
+        }
+    }
+    
+    private var sectionDates: [Date] {
+        groupedEntries.keys.sorted(by: >)
+    }
+    
+    private func entrySectionHeader(for date: Date) -> some View {
+        HStack {
+            Text(date, style: .date)
+            Spacer()
+        }
+    }
+    
+    private func entrySection(date: Date, groupedEntry: [Date: [Entry]]) -> some View {
+        guard let entry = groupedEntry[date], !entry.isEmpty else {
+            return AnyView(EmptyView())
+        }
+        
+        return AnyView(
+            Section(header: entrySectionHeader(for: date)) {
+                ForEach(entry, id: \.self) { entry in
+                    NavigationLink {
+                        
+                    } label: {
+                        VehicleDetailCard(entry: entry)
+                    }
+                }
+            }
+        )
+    }
+    
+    var body: some View {
+        List {
+            ForEach(sectionDates, id: \.self) { date in
+                entrySection(date: date, groupedEntry: groupedEntries)
+            }
+        }.listStyle(GroupedListStyle())
+    }
+    
+}
 
 struct VehicleDetailView: View {
-    let vehicle: Cars
+    let vehicle: Car
     @State private var searchText = ""
     @State private var showFilterSheet = false  // Show/hide the filter modal
     @State private var showEditSheet = false
@@ -42,55 +106,56 @@ struct VehicleDetailView: View {
     @State private var plateNumber: String
     
     
-    init(vehicle: Cars) {
+    init(vehicle: Car) {
             self.vehicle = vehicle
             // Initialize plateNumber from the passed vehicle
             _plateNumber = State(initialValue: vehicle.plate)
         }
     
-    var filteredEntries: [String: [Entries]] {
-            vehicle.groupedEntries
-                .mapValues { $0.filter { entry in
-                    entry.time >= startDate && entry.time <= endDate
-                }}
-                .filter { !$0.value.isEmpty }
-        }
-    var body: some View {
-//        NavigationStack {
-            
-            List {
-                ForEach(vehicle.groupedEntries.keys.sorted(by: { $0 > $1 }), id: \.self) { date in
-                    Section(header: Text(date).font(.headline)) {
-                        ForEach(vehicle.groupedEntries[date] ?? [], id: \.time) { entry in
-                            
-                            VehicleDetailCard(entry: entry)
-                                .swipeActions(edge: .leading) {
-                                    Button(role: .cancel) {
-                                                print("Delete tapped")
-                                    } label: {
-                                        Label("Edit", systemImage: "pencil")
-                                            
-                                    }
-                                        }
-                            
-                                .swipeActions(edge: .trailing) {
-                                    
-                                            Button(role: .destructive) {
-                                                print("Delete tapped")
-                                            } label: {
-                                                Label("Delete", systemImage: "trash")
-                                            }
-                                    
-                                
-                                }
-                                
+    var filteredEntries: [Date: [Entry]] {
+        vehicle.groupedEntries
+            .mapValues { $0.filter { entry in
+                entry.time >= startDate && entry.time <= endDate
+            }}
+            .filter { !$0.value.isEmpty }
+    }
 
-                                                    
-                            .padding(.vertical, 4)
-                        }
-                    }
-                }
-            }
+    var body: some View {
+            
+            GroupedEntryView(entry: vehicle.entry)
+//            List {
+//                ForEach(vehicle.groupedEntries.keys.sorted(by: { $0 > $1 }), id: \.self) { date in
+//                    Section(header: Text(date).font(.headline)) {
+//                        ForEach(vehicle.groupedEntries[date] ?? [], id: \.time) { entry in
+//                            
+//                            VehicleDetailCard(entry: entry)
+//                                .swipeActions(edge: .leading) {
+//                                    Button(role: .cancel) {
+//                                                print("Delete tapped")
+//                                    } label: {
+//                                        Label("Edit", systemImage: "pencil")
+//                                            
+//                                    }
+//                                        }
+//                            
+//                                .swipeActions(edge: .trailing) {
+//                                    
+//                                            Button(role: .destructive) {
+//                                                print("Delete tapped")
+//                                            } label: {
+//                                                Label("Delete", systemImage: "trash")
+//                                            }
+//                                    
+//                                
+//                                }
+//                                
+//
+//                                                    
+//                            .padding(.vertical, 4)
+//                        }
+//                    }
+//                }
+//            }
             .searchable(text: $searchText, prompt: "Search categories" )
             .padding(.top)
             
