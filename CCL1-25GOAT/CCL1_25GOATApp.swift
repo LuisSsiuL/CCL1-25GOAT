@@ -13,7 +13,6 @@ final class Entry {
         self.time = time
         self.note = note
     }
-    
 }
 
 @Model
