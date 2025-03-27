@@ -44,7 +44,10 @@ final class Car {
 //        Dictionary(grouping: entry, by: { $0.time })
 //                .mapValues { $0.sorted(by: { $0.time > $1.time }) } // Sort by most recent first
 //    }
+<<<<<<< Updated upstream
 //>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 }
 
 @main
