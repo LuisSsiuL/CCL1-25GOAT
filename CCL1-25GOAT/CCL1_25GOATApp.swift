@@ -2,8 +2,8 @@ import SwiftUI
 import SwiftData
 
 @Model
-<<<<<<< Updated upstream
-=======
+//<<<<<<< Updated upstream
+//=======
 final class Entry {
     var category: String
     var time: Date
@@ -18,19 +18,17 @@ final class Entry {
 }
 
 @Model
->>>>>>> Stashed changes
+//>>>>>>> Stashed changes
 final class Car {
     var plate: String
     var type: String
     var time: Date
+    var entry: [Entry]
     
-    init(plate: String, type: String, time: Date) {
+    init(plate: String, type: String, time: Date, entry: [Entry]) {
         self.plate = plate
         self.type = type
-<<<<<<< Updated upstream
         self.time = time
-    }
-=======
         self.entry = entry
     }
     
@@ -46,7 +44,7 @@ final class Car {
 //        Dictionary(grouping: entry, by: { $0.time })
 //                .mapValues { $0.sorted(by: { $0.time > $1.time }) } // Sort by most recent first
 //    }
->>>>>>> Stashed changes
+//>>>>>>> Stashed changes
 }
 
 @main

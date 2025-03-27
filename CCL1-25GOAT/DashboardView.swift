@@ -1,22 +1,22 @@
 import SwiftUI
 import SwiftData
 
-<<<<<<< Updated upstream
-struct Entries {
-    var category: String,
-        time: Date,
-        image: Data?,
-        note: String?
-}
-
-struct Cars {
-    var plate: String,
-        type: String,
-        entries: [Entries]
-    
-    var mostRecentDate: Date {
-        entries.max(by: { $0.time < $1.time })?.time ?? Date()
-=======
+//<<<<<<< Updated upstream
+//struct Entries {
+//    var category: String,
+//        time: Date,
+//        image: Data?,
+//        note: String?
+//}
+//
+//struct Cars {
+//    var plate: String,
+//        type: String,
+//        entries: [Entries]
+//    
+//    var mostRecentDate: Date {
+//        entries.max(by: { $0.time < $1.time })?.time ?? Date()
+//=======
 //<<<<<<< Updated upstream
 //struct Entries {
 //    var category: String,
