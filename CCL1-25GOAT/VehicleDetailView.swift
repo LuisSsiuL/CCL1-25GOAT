@@ -78,6 +78,13 @@ struct GroupedEntryView: View {
                         
                     } label: {
                         VehicleDetailCard(entry: entry)
+                            .swipeActions(edge: .leading) {
+                                EditButton()
+                                                                   }
+                            .swipeActions(edge: .trailing) {
+                                DeleteButton(for: entry)
+                                            }
+                            
                     }
                 }
             }

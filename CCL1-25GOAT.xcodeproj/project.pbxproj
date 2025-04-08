@@ -6,7 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		DA0DB7562D9D41E100899FA9 /* OCRModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0DB7552D9D41E100899FA9 /* OCRModel.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		DA0DB7552D9D41E100899FA9 /* OCRModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRModel.swift; sourceTree = "<group>"; };
 		DA82E4AA2D915D9F00E5E798 /* CCL1-25GOAT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CCL1-25GOAT.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -32,6 +37,7 @@
 		DA82E4A12D915D9F00E5E798 = {
 			isa = PBXGroup;
 			children = (
+				DA0DB7552D9D41E100899FA9 /* OCRModel.swift */,
 				DA82E4AC2D915D9F00E5E798 /* CCL1-25GOAT */,
 				DA82E4AB2D915D9F00E5E798 /* Products */,
 			);
@@ -119,6 +125,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA0DB7562D9D41E100899FA9 /* OCRModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
