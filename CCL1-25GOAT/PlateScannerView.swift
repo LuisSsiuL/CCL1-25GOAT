@@ -56,7 +56,6 @@ struct PlateScannerView: View {
                             Text("Back")
                         }
                     }
-                    .padding(.left)
                 }
             }
         }

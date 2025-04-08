@@ -141,6 +141,7 @@ struct DashboardView: View {
     @State var searchText: String = ""
     @State private var isSearching: Bool = false
     @State private var showNewEntrySheet: Bool = false
+    @State private var showScannerSheet: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -149,7 +150,7 @@ struct DashboardView: View {
                 if isSearching {
                     
                     Button {
-                        // Add new entry logic here.
+                        showScannerSheet = true
                     } label: {
                         Text("Search by Scan")
                             .font(.system(size: 19, weight: .bold, design: .default))
@@ -198,6 +199,10 @@ struct DashboardView: View {
                 AddNewEntryView()
                     .presentationDetents([.fraction(0.95)])
             }
+        }
+        .sheet(isPresented: $showScannerSheet){
+            PlateScannerView()
+                .presentationDetents([.fraction(0.90)])
         }
     }
 }

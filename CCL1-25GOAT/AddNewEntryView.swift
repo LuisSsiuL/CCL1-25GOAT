@@ -8,6 +8,7 @@ struct AddNewEntryView: View {
     @State private var text = ""
     @State private var category: String = ""  // New state for category text field
     @State private var showNewEntrySheet = false
+    @State private var showScannerSheet = false
     
     var body: some View {
         NavigationStack {
@@ -30,6 +31,7 @@ struct AddNewEntryView: View {
                     .padding(.vertical, 16)
                     
                     Button {
+                        showScannerSheet = true
                         print("loading camera")
                     } label: {
                         Image(systemName: "camera")
@@ -166,6 +168,9 @@ struct AddNewEntryView: View {
             }
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(Color(.systemBackground), for: .navigationBar)
+            .sheet(isPresented: $showScannerSheet) {
+                PlateScannerView()
+            }
         }
         
     }
