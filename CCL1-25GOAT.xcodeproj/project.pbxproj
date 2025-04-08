@@ -10,9 +10,22 @@
 		DA82E4AA2D915D9F00E5E798 /* CCL1-25GOAT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CCL1-25GOAT.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		6498E0D42DA51AF7004D80B5 /* Exceptions for "CCL1-25GOAT" folder in "CCL1-25GOAT" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = DA82E4A92D915D9F00E5E798 /* CCL1-25GOAT */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		DA82E4AC2D915D9F00E5E798 /* CCL1-25GOAT */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				6498E0D42DA51AF7004D80B5 /* Exceptions for "CCL1-25GOAT" folder in "CCL1-25GOAT" target */,
+			);
 			path = "CCL1-25GOAT";
 			sourceTree = "<group>";
 		};
@@ -255,6 +268,7 @@
 				DEVELOPMENT_TEAM = U4A9QQ2CVC;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "CCL1-25GOAT/Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -284,6 +298,7 @@
 				DEVELOPMENT_TEAM = U4A9QQ2CVC;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "CCL1-25GOAT/Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

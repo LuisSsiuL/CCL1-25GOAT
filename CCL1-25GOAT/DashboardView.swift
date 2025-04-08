@@ -125,6 +125,7 @@ struct DashboardView: View {
     }
     
     @State var searchText: String = ""
+    @State private var showPlateScanner: Bool = false
     
     var body: some View {
         
@@ -144,22 +145,34 @@ struct DashboardView: View {
             }.background(.ultraThinMaterial)
                 .searchable(text: $searchText,  placement: .navigationBarDrawer)                .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text("Dashboard").font(.system(size: 20, weight: .bold, design: .default))
-                }
-                
-                ToolbarItem(placement: .bottomBar) {
-                    Button {
-                        
-                    } label: {
-                        Text("+ Add New Entry").font(.system(size: 19, weight: .bold, design: .default))
-                            .foregroundStyle(.white)
-                            .frame(width: 330, height: 36, alignment: .center)
-                            .background(Color.blue)
-                            .containerShape(RoundedRectangle(cornerSize: .init(width: 10, height: 10)))
+                    ToolbarItem(placement: .principal) {
+                        Text("Dashboard").font(.system(size: 20, weight: .bold, design: .default))
                     }
-                }
+                    
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button {
+                            showPlateScanner = true
+                        } label: {
+                            Text("Scan")
+                                .foregroundStyle(.blue)
+                        }
+                    }
+                    
+                    ToolbarItem(placement: .bottomBar) {
+                        Button {
+                            
+                        } label: {
+                            Text("+ Add New Entry").font(.system(size: 19, weight: .bold, design: .default))
+                                .foregroundStyle(.white)
+                                .frame(width: 330, height: 36, alignment: .center)
+                                .background(Color.blue)
+                                .containerShape(RoundedRectangle(cornerSize: .init(width: 10, height: 10)))
+                        }
+                    }
             }.toolbarBackground(.visible, for: .navigationBar)
+                .sheet(isPresented: $showPlateScanner) {
+                    PlateScannerView()
+                }
         }
     }
 }
