@@ -20,7 +20,7 @@ struct VehicleEditView: View {
                     Button("Cancel") {
                         dismiss()
                     }
-                    .tint(.red)
+                    .tint(.blue)
                 }
                 
                 // Save button on the top right
@@ -29,6 +29,7 @@ struct VehicleEditView: View {
                         // Save logic here
                         dismiss()
                     }
+                    .bold(true)
 //                    .buttonStyle(.borderedProminent)
                 }
             }

@@ -1,25 +1,6 @@
 import SwiftUI
 import SwiftData
 
-//<<<<<<< Updated upstream
-//struct Entries {
-//    var category: String,
-//        time: Date,
-//        image: Data?,
-//        note: String?
-//    var formattedDate: String {
-//        let formatter = DateFormatter()
-//        formatter.dateFormat = "dd MMM yyyy"
-//        return formatter.string(from: time)
-//       }
-//
-//}
-//
-//struct Cars {
-//    var plate: String,
-//        type: String,
-//        entries: [Entries]
-//=======
 struct GroupedCarList: View {
     
     let car: [Car]
@@ -44,7 +25,7 @@ struct GroupedCarList: View {
     
     private func carSectionHeader(for date: Date) -> some View {
         HStack {
-            Text(date.formatted(.dateTime.day().month().year())).font(.caption)
+            Text(date.formatted(.dateTime.day().month().year())).font(.headline)
             Spacer()
         }
     }
@@ -76,14 +57,51 @@ struct DashboardCard: View {
     //struct ver
     let cars: Car
     let entry: [Entry]
+    var latestEntry: Entry {
+            cars.entry.sorted(by: { $0.time > $1.time }).first!
+        }
     
     var body: some View {
         HStack {
-            Image(systemName: cars.type == "Car" ? "car.side.fill" : "motorcycle.fill").foregroundStyle(.secondary)
-            Text(cars.plate)
+            VStack{
+                HStack{
+                    Image(systemName: cars.type == "Car" ? "car.side.fill" : "motorcycle.fill").foregroundStyle(.secondary)
+                        .font(.system(size: 24))
+                    
+                    Text(cars.plate)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        
+                    Spacer()
+                 
+                    
+                }
+                HStack {
+                    Text(latestEntry.category)
+                        .font(.footnote)
+                    Text(latestEntry.note)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                }
+                
+                HStack{
+                    Text("Note posted \(relativeTimeString(from: cars.mostRecentEntry))")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                    Spacer()
+                }
+                
+            }
+            
             Spacer()
-            Text(cars.mostRecentEntry, format: .dateTime.hour().minute()).foregroundStyle(.secondary)
         }
+    }
+    
+    func relativeTimeString(from date: Date) -> String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .short // or use .full for "Last updated 2 hours ago"
+        return formatter.localizedString(for: date, relativeTo: Date())
     }
 }
 
@@ -113,52 +131,23 @@ struct DashboardView: View {
         NavigationStack {
             
             VStack {
-                HStack {
-                    Text("Kendaraan Baru").font(.largeTitle).fontWeight(.bold)
-                    Spacer()
-                }.padding(.horizontal).padding(.top)
+//                HStack {
+//                    Text("Kendaraan Baru").font(.largeTitle).fontWeight(.bold)
+//                    Spacer()
+//                }.padding(.horizontal).padding(.top)
                 
-//                List(carsSearch, id: \.plate) { car in
-//                    NavigationLink {
-//                        //navigate to detail page of clicked list
-//                        VehicleDetailView(plate: car.plate)
-//                    } label: {
-//                        DashboardCard(cars: car, entry: car.entry)
-//                    }
-//                }.scrollContentBackground(.hidden)
-//                    .searchable(text: $searchText, placement: .navigationBarDrawer)
+
                 
-                GroupedCarList(car: carsSearch).scrollContentBackground(.hidden).searchable(text: $searchText, placement: .navigationBarDrawer)
+                GroupedCarList(car: carsSearch).scrollContentBackground(.hidden)
                 
-//<<<<<<< Updated upstream
-//                List(carsSearch, id: \.plate) { car in
-//                    NavigationLink {
-//                        //navigate to detail page of clicked list
-//                        VehicleDetailView(vehicle: car)
-//                    } label: {
-//                        DashboardCard(cars: car, entries: car.entries)
-//                    }
-//                }.scrollContentBackground(.hidden)
-//                    .searchable(text: $searchText, placement: .navigationBarDrawer)
-//=======
-//>>>>>>> Stashed changes
-                // APPLY SWIPE ACTION HERE
                 
-            }.background(.ultraThinMaterial)                .navigationBarTitleDisplayMode(.inline)
+            }.background(.ultraThinMaterial)
+                .searchable(text: $searchText,  placement: .navigationBarDrawer)                .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text("Welcome").font(.system(size: 20, weight: .bold, design: .default))
+                    Text("Dashboard").font(.system(size: 20, weight: .bold, design: .default))
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        // to-do: open scanner page
-                    } label: {
-                        VStack {
-                            Image(systemName: "camera.viewfinder").accessibilityHint("Camera")
-                            Text("Scan").font(.footnote)
-                        }
-                    }
-                }
+                
                 ToolbarItem(placement: .bottomBar) {
                     Button {
                         
