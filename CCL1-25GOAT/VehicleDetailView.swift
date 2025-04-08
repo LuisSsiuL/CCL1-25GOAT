@@ -5,30 +5,34 @@ struct VehicleDetailCard: View {
     let entry: Entry
 
     var body: some View {
-        HStack {
-            if let imageData = entry.image, let uiImage = UIImage(data: imageData) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .frame(width: 50, height: 50)
-                    .cornerRadius(8)
-            }
-
-            VStack(alignment: .leading) {
-                Text(entry.category)
-                    .font(.subheadline)
-                    .bold()
-                if !entry.note.isEmpty {
-                    Text(entry.note)
-                        .font(.body)
-                        .foregroundColor(.gray)
+        VStack {
+            
+            HStack {
+                if let imageData = entry.image, let uiImage = UIImage(data: imageData) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .frame(width: 50, height: 50)
+                        .cornerRadius(8)
                 }
+                
+                VStack(alignment: .leading) {
+                    Text(entry.category)
+                        .font(.subheadline)
+                        .bold()
+                    if !entry.note.isEmpty {
+                        Text(entry.note)
+                            .font(.body)
+                            .foregroundColor(.gray)
+                    }
+                }
+                Spacer()
+                Text(entry.time.formatted(date: .omitted, time: .shortened))
+                
             }
-            Spacer()
-            Text(entry.time.formatted(date: .omitted, time: .shortened))
-
         }
     }
 }
+
 private func DeleteButton(for entry: Entry) -> some View {
     Button(role: .destructive) {
         print("Delete tapped")
@@ -39,7 +43,7 @@ private func DeleteButton(for entry: Entry) -> some View {
 
 private func EditButton(for entry: Entry) -> some View {
     Button(role: .cancel) {
-        print("Delete tapped")
+        print("Edit tapped")
     } label: {
         Label("Edit", systemImage: "pencil")
     }
@@ -48,6 +52,7 @@ private func EditButton(for entry: Entry) -> some View {
 struct GroupedEntryView: View {
     
     let entry: [Entry]
+    var headerView: AnyView? = nil
     
     private var groupedEntries: [Date: [Entry]] {
         Dictionary(grouping: entry) { entry in
@@ -79,30 +84,12 @@ struct GroupedEntryView: View {
                     } label: {
                         VehicleDetailCard(entry: entry)
                             .swipeActions(edge: .leading) {
-                                EditButton()
-                                                                   }
+                                EditButton(for: entry)
+                            }
                             .swipeActions(edge: .trailing) {
                                 DeleteButton(for: entry)
-                                            }
-                            
-                    }
-                    .swipeActions(edge: .leading) {
-                        Button(role: .cancel) {
-                                    print("Delete tapped")
-                        } label: {
-                            Label("Edit", systemImage: "pencil")
-
-                        }
                             }
-                    .swipeActions(edge: .trailing) {
-
-                                Button(role: .destructive) {
-                                    print("Delete tapped")
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                }
-                    
+                    }
                 }
             }
         )
@@ -110,31 +97,80 @@ struct GroupedEntryView: View {
     
     var body: some View {
         List {
+            if let headerView = headerView {
+                Section {
+                    headerView
+                }
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets())
+            }
+            
             ForEach(sectionDates, id: \.self) { date in
                 entrySection(date: date, groupedEntry: groupedEntries)
             }
-        }.listStyle(GroupedListStyle())
+        }
+        .listStyle(GroupedListStyle())
     }
+}
+
+struct CategoryVehicleDetailView: View {
+    @Binding var selectedVehicle: String
     
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 5) {
+                Image(systemName: "motorcycle.fill").font(.system(size: 20))
+                Text("Motor")
+            }
+            .frame(width: 75, height: 75)
+            .foregroundColor(selectedVehicle == "Bike" ? .white: .grey2)
+            .background(selectedVehicle == "Bike" ? .blue : .clear)
+            .cornerRadius(15)
+            .overlay{RoundedRectangle(cornerRadius: 15).stroke(Color.grey1,lineWidth: 2)}
+            .onTapGesture {
+                withAnimation {
+                    selectedVehicle = "Bike"
+                }
+            }
+            
+            VStack(spacing: 5) {
+                Image(systemName: "car.fill").font(.system(size: 20))
+                Text("Mobil")
+            }
+            .frame(width: 75, height: 75)
+            .foregroundColor(selectedVehicle == "Car" ? .white: .grey2)
+            .background(selectedVehicle == "Car" ? .blue : .clear)
+            .cornerRadius(15)
+            .overlay{RoundedRectangle(cornerRadius: 15).stroke(Color.grey1,lineWidth: 2)}
+            .onTapGesture {
+                withAnimation {
+                    selectedVehicle = "Car"
+                }
+            }
+        }
+    }
 }
 
 struct VehicleDetailView: View {
+    
     let vehicle: Car
     @State private var searchText = ""
     @State private var showFilterSheet = false  // Show/hide the filter modal
     @State private var showEditSheet = false
     @State private var showAddNoteSheet = false
-    @State private var showDeleteConfirmationSheet = false
+    @State private var showDeleteAlert = false
     @State private var startDate = Calendar.current.date(byAdding: .day, value: -7, to: Date()) ?? Date() // Default: 7 days ago
     @State private var endDate = Date() // Default: Today
     @State private var plateNumber: String
-    
+    @State private var entryToDelete: Entry? = nil
+    @State private var selectedVehicle: String
     
     init(vehicle: Car) {
-            self.vehicle = vehicle
-            // Initialize plateNumber from the passed vehicle
-            _plateNumber = State(initialValue: vehicle.plate)
-        }
+        self.vehicle = vehicle
+        // Initialize plateNumber from the passed vehicle
+        _plateNumber = State(initialValue: vehicle.plate)
+        _selectedVehicle = State(initialValue: vehicle.type)
+    }
     
     var filteredEntries: [Date: [Entry]] {
         vehicle.groupedEntries
@@ -145,79 +181,93 @@ struct VehicleDetailView: View {
     }
 
     var body: some View {
-            
-            GroupedEntryView(entry: vehicle.entry)
-            .searchable(text: $searchText, prompt: "Search categories" )
+        let headerView = AnyView(
+            VStack(spacing: 0) {
+                HStack {
+                    TextField("Plate Number", text: .constant(vehicle.plate), prompt: Text("Write your plate number"))
+                        .multilineTextAlignment(.center)
+                        .padding(.all, 5)
+                        .frame(height: 75)
+                        .background(.white)
+                        .cornerRadius(5)
+                        .font(.largeTitle)
+                    
+                    CategoryVehicleDetailView(selectedVehicle: $selectedVehicle)
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 10)
+                .background(.ultraThinMaterial)
+            }
+        )
+        
+        GroupedEntryView(entry: vehicle.entry, headerView: headerView)
             .padding(.top)
-            
+            .searchable(text: $searchText, placement: .navigationBarDrawer, prompt: "Search categories")
             .toolbar {
-                ToolbarItem(placement: .principal) {
-                                Button {
-                                    showEditSheet = true
-                                } label: {
-                                    HStack {
-                                        Image(systemName: vehicle.type == "Car" ? "car.side.fill" : "motorcycle.fill").foregroundStyle(.secondary)
-                                            .foregroundColor(.gray)
-                                        Text(vehicle.plate).font(.system(size: 20, weight: .bold, design: .default)).foregroundStyle(.black)
-                                        Image(systemName: "pencil")
-                                    }
-                                }
-                            }
+//                ToolbarItem(placement: .principal) {
+//                    Button {
+//                        showEditSheet = true
+//                    } label: {
+//                        HStack {
+//                            Image(systemName: vehicle.type == "Car" ? "car.side.fill" : "motorcycle.fill").foregroundStyle(.secondary)
+//                                .foregroundColor(.gray)
+//                            Text(vehicle.plate).font(.system(size: 20, weight: .bold, design: .default)).foregroundStyle(.black)
+//                            Image(systemName: "pencil")
+//                        }
+//                    }
+//                }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button {
                         showFilterSheet = true
-                    }
-                    label: {
+                    } label: {
                         Image(systemName: "line.3.horizontal.decrease.circle")
-                            .foregroundColor(.yellow)
+                            .foregroundColor(.blue)
                     }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
                     
                     Button {
-                        // Add delete logic
-                        showDeleteConfirmationSheet = true
+                        showDeleteAlert = true
                     } label: {
                         Image(systemName: "trash")
-                            .foregroundColor(.red)
+                            .foregroundColor(.blue)
                     }
                 }
+                
                 ToolbarItem(placement: .bottomBar) {
                     Button {
                         // Add new note logic
                         showAddNoteSheet = true
                     } label: {
                         Text("+ Add New Note").font(.system(size: 19, weight: .bold, design: .default))
-                                                .foregroundStyle(.white)
-                                                .frame(width: 330, height: 36, alignment: .center)
-                                                .background(Color.blue)
-                                                .containerShape(RoundedRectangle(cornerSize: .init(width: 10, height: 10)))
+                            .foregroundStyle(.white)
+                            .frame(width: 330, height: 36, alignment: .center)
+                            .background(Color.blue)
+                            .containerShape(RoundedRectangle(cornerSize: .init(width: 10, height: 10)))
                     }
                 }
             }
             .sheet(isPresented: $showFilterSheet) {
                 FilterView(startDate: $startDate, endDate: $endDate)
                     .presentationDetents([.fraction(0.4)])
-            
-        }
+            }
             .sheet(isPresented: $showEditSheet) {
                 VehicleEditView(plateNumber: $plateNumber)
                     .presentationDetents([.fraction(0.4)])
-                
             }
             .sheet(isPresented: $showAddNoteSheet) {
                 VehicleAddNoteView()
             }
-            .sheet(isPresented: $showDeleteConfirmationSheet) {
-                DeleteConfirmationView()
-                    .presentationDetents([.fraction(0.2)])
+            .alert("Confirm Deletion?", isPresented: $showDeleteAlert) {
+                Button("Cancel", role: .cancel) {}
+                Button("Delete", role: .destructive) {
+                    // Delete logic would go here
+                }
+            } message: {
+                Text("Are you sure you want to delete this vehicle?")
             }
     }
 }
 
 #Preview {
-    
     DashboardView()
-    
 }

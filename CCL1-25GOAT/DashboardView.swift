@@ -85,9 +85,6 @@ struct DashboardCard: View {
                     Spacer()
                 }
                 
-                
-                
-                Divider()
                 HStack{
                     Text("Note posted \(relativeTimeString(from: cars.mostRecentEntry))")
                                 .font(.footnote)
@@ -128,57 +125,29 @@ struct DashboardView: View {
     }
     
     @State var searchText: String = ""
-    @State private var isSearchBarVisible: Bool = false
     
     var body: some View {
+        
         NavigationStack {
+            
             VStack {
-                HStack {
-                    Text("Kendaraan Baru").font(.largeTitle).fontWeight(.bold)
-                    Spacer()
-                }.padding(.horizontal).padding(.top)
+//                HStack {
+//                    Text("Kendaraan Baru").font(.largeTitle).fontWeight(.bold)
+//                    Spacer()
+//                }.padding(.horizontal).padding(.top)
+                
+
                 
                 GroupedCarList(car: carsSearch).scrollContentBackground(.hidden)
-            }
-            .background(.ultraThinMaterial)
-            .overlay {
-                if isSearchBarVisible {
-                    Color.black.opacity(0.0001) // Invisible but catchable overlay
-                        .onTapGesture {
-                            isSearchBarVisible = false
-                            searchText = ""
-                        }
-                }
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
+                
+                
+            }.background(.ultraThinMaterial)
+                .searchable(text: $searchText,  placement: .navigationBarDrawer)                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text("Welcome").font(.system(size: 20, weight: .bold, design: .default))
+                    Text("Dashboard").font(.system(size: 20, weight: .bold, design: .default))
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        withAnimation {
-                            isSearchBarVisible.toggle()
-                            if !isSearchBarVisible {
-                                searchText = ""
-                            }
-                        }
-                    } label: {
-                        Image(systemName: isSearchBarVisible ? "xmark" : "magnifyingglass")
-                            .foregroundColor(.gray)
-                            .font(.system(size: 20, design: .default))
-                    }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        // to-do: open scanner page
-                    } label: {
-                        VStack {
-                            Image(systemName: "camera.viewfinder").accessibilityHint("Camera")
-                            Text("Scan").font(.footnote)
-                        }
-                    }
-                }
+                
                 ToolbarItem(placement: .bottomBar) {
                     Button {
                         
@@ -190,50 +159,8 @@ struct DashboardView: View {
                             .containerShape(RoundedRectangle(cornerSize: .init(width: 10, height: 10)))
                     }
                 }
-            }
-            .toolbarBackground(.visible, for: .navigationBar)
-            .modifier(SearchBarModifier(isSearchBarVisible: $isSearchBarVisible, searchText: $searchText))
+            }.toolbarBackground(.visible, for: .navigationBar)
         }
-    }
-}
-
-// Create a custom search bar modifier
-struct SearchBarModifier: ViewModifier {
-    @Binding var isSearchBarVisible: Bool
-    @Binding var searchText: String
-    
-    func body(content: Content) -> some View {
-        content
-            .safeAreaInset(edge: .top) {
-                if isSearchBarVisible {
-                    VStack(spacing: 0) {
-                        Divider()
-                        HStack {
-                            Image(systemName: "magnifyingglass")
-                                .foregroundColor(.gray)
-                            TextField("Search", text: $searchText)
-                                .submitLabel(.search)
-                                .onSubmit {
-                                    // Handle search submission if needed
-                                }
-                            
-                            if !searchText.isEmpty {
-                                Button(action: {
-                                    searchText = ""
-                                }) {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundColor(.gray)
-                                }
-                            }
-                        }
-                        .padding(.horizontal)
-                        .padding(.vertical, 10)
-                        .background(.ultraThinMaterial)
-                        Divider()
-                    }
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                }
-            }
     }
 }
 
