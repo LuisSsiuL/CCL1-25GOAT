@@ -65,7 +65,7 @@ struct VehicleAddNoteView: View {
                             Button("Cancel") {
                                 dismiss()
                             }
-                            .tint(.red)
+//                            .tint(.red)
                         }
                         
                         // Save button on the top right
@@ -74,6 +74,7 @@ struct VehicleAddNoteView: View {
                                 // Save logic here
                                 dismiss()
                             }
+                            .bold(true)
         //                    .buttonStyle(.borderedProminent)
                         }
                     }
