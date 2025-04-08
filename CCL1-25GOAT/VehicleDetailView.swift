@@ -204,18 +204,7 @@ struct VehicleDetailView: View {
             .padding(.top)
             .searchable(text: $searchText, placement: .navigationBarDrawer, prompt: "Search categories")
             .toolbar {
-//                ToolbarItem(placement: .principal) {
-//                    Button {
-//                        showEditSheet = true
-//                    } label: {
-//                        HStack {
-//                            Image(systemName: vehicle.type == "Car" ? "car.side.fill" : "motorcycle.fill").foregroundStyle(.secondary)
-//                                .foregroundColor(.gray)
-//                            Text(vehicle.plate).font(.system(size: 20, weight: .bold, design: .default)).foregroundStyle(.black)
-//                            Image(systemName: "pencil")
-//                        }
-//                    }
-//                }
+
                 
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button {
