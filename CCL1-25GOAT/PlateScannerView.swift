@@ -27,6 +27,7 @@ struct PlateScannerView: View {
                 
                 Text("Plat Nomor Terdeteksi:")
                     .padding(.top)
+                    .foregroundStyle(Color.white)
                 Text(recognizedText)
                     .padding([.horizontal, .bottom])
                     .foregroundColor(.blue)
@@ -54,7 +55,7 @@ struct PlateScannerView: View {
                 }
                 .toolbar {
                     ToolbarItem(placement: .principal) {
-                        Text("Scanner").font(.headline)
+                        Text("Scanner").font(.headline).foregroundStyle(Color.white)
                     }
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button {
@@ -65,7 +66,10 @@ struct PlateScannerView: View {
                     }
                 }
                 .toolbarBackgroundVisibility(.visible)
+                .toolbarBackground(Color.black, for: .navigationBar)
+                .toolbarTitleDisplayMode(.inline)
             }
+            .background(Color.black)
         }
         .alert(isPresented: $isPresentedPlateDetected) {
             print("is detected")
