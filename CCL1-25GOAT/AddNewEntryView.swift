@@ -134,7 +134,7 @@ struct AddNewEntryView: View {
             }
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(Color(.systemBackground), for: .navigationBar)
-            .sheet(isPresented: $showScannerSheet) {
+            .fullScreenCover(isPresented: $showScannerSheet) {
                 PlateScannerView(plateNumber: $plateNumber)
             }
         }
