@@ -26,7 +26,7 @@ struct AddNewEntryView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     plateNumberSection
-                    VehicleTypeChooser(selectedVehicleType: selectedVehicleType)
+                    VehicleTypeChooser(selectedVehicleType: $selectedVehicleType)
                     categorySection
                     catatanSection
                 }
@@ -46,7 +46,7 @@ struct AddNewEntryView: View {
                             saveEntry()
                             dismiss()
                         }
-                        .disabled(plateNumber.isEmpty && selectedVehicleType == "")
+                        .disabled(plateNumber.isEmpty || selectedVehicleType == "")
                         .bold()
                     }
                 }
@@ -178,7 +178,7 @@ struct AddNewEntryView: View {
 
 struct VehicleTypeChooser: View {
     
-    @State var selectedVehicleType: String?
+    @Binding var selectedVehicleType: String
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -202,7 +202,8 @@ struct VehicleTypeChooser: View {
                 }
                 .onTapGesture {
                     withAnimation {
-                        selectedVehicleType = (selectedVehicleType == "Bike") ? nil : "Bike"
+                        selectedVehicleType = (selectedVehicleType == "Bike") ? "" : "Bike"
+                        print(selectedVehicleType)
                     }
                 }
                 
@@ -221,7 +222,8 @@ struct VehicleTypeChooser: View {
                 }
                 .onTapGesture {
                     withAnimation {
-                        selectedVehicleType = (selectedVehicleType == "Car") ? nil : "Car"
+                        selectedVehicleType = (selectedVehicleType == "Car") ? "" : "Car"
+                        print(selectedVehicleType)
                     }
                 }
             }
