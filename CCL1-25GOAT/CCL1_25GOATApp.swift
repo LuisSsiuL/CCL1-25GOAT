@@ -43,9 +43,11 @@ final class Car {
 
 @main
 struct CCL1_25GOATApp: App {
+    
     var body: some Scene {
         WindowGroup {
             DashboardView()
+                .preferredColorScheme(.light)
         }
         // SwiftData container setup
         .modelContainer(for: Car.self)

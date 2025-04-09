@@ -6,12 +6,13 @@ struct PlateScannerView: View {
     
     @Environment(\.dismiss) var dismiss
     
-    var addNewEntryView = AddNewEntryView()
     @State private var recognizedText: String = "Menunggu hasil scan..."
     @State var presentedText: String = "No Text Found"
     @State var isPresentedPlateDetected: Bool = false
     @State var isPresentedPlateNotDetected: Bool = false
     @State var isNewEntry: Bool = false
+    
+    @Binding var plateNumber: String
     
     var body: some View {
         
@@ -48,24 +49,6 @@ struct PlateScannerView: View {
                         .frame(width: 80, height: 80)
                         .foregroundColor(.blue)
                 }
-                .alert(isPresented: $isPresentedPlateDetected) {
-                    print("is detected")
-//                    if (isNewEntry == true) {
-//                        Alert(title: Text("Create New Entry"), message: Text("\(String(describing: presentedText)) has not been registered. Create new entry?"), primaryButton: .default(Text("Create"), action: {
-//                            // pass data to addnewentry
-//                            addNewEntryView.plateNumber = presentedText
-//                            dismiss()
-//                        }), secondaryButton: .cancel(Text("Cancel"))
-//                        )
-//                    } else {
-                        return Alert(title: Text("Proceed With Scan"), message: Text("Number plate is detected as: \(String(describing: presentedText)). Continue?"), primaryButton: .default(Text("Continue"), action: {
-                            // pass data to addnewentry
-                            dismiss()
-                        })
-                              , secondaryButton: .cancel(Text("Cancel"))
-                        )
-//                    }
-                }
                 .alert(isPresented: $isPresentedPlateNotDetected) {
                     Alert(title: Text("Plate Not Detected"), message: Text("Direct the camera to the vehicle's number plate"), dismissButton: .default(Text("Try Again")))
                 }
@@ -81,9 +64,18 @@ struct PlateScannerView: View {
                         }
                     }
                 }
+                .toolbarBackgroundVisibility(.visible)
             }
         }
-        
+        .alert(isPresented: $isPresentedPlateDetected) {
+            print("is detected")
+            return Alert(title: Text("Proceed With Scan"), message: Text("Number plate is detected as: \(String(describing: presentedText)). Continue?"), primaryButton: .default(Text("Continue"), action: {
+                // pass data to addnewentry
+                plateNumber = presentedText
+                dismiss()
+            }), secondaryButton: .cancel(Text("Cancel"))
+            )
+        }
     }
 }
 
@@ -209,7 +201,6 @@ class CameraUIView: UIView {
         super.layoutSubviews()
         previewLayer?.frame = bounds
     }
-    
 }
 
 #Preview {

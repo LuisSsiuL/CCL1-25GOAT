@@ -3,6 +3,10 @@ import SwiftData
 
 struct AddNewEntryView: View {
     
+    @Environment(\.modelContext) var modelContext
+    @Query var cars: [Car]
+    @State private var selectedCar: Car?
+    
     @State var plateNumber: String = ""
     @Environment(\.dismiss) var dismiss
     @State var selectedVehicleType: String? = nil
@@ -25,6 +29,7 @@ struct AddNewEntryView: View {
                                 .padding()
                                 .background(Color(UIColor.systemGray5))
                                 .cornerRadius(5)
+                                .autocapitalization(.allCharacters)
                         }
                     }
                     .formStyle(.columns)
@@ -76,25 +81,28 @@ struct AddNewEntryView: View {
                 
                 // Bottom Section: Tambahkan Catatan
                 VStack(alignment: .leading, spacing: 16) {
+                    
                     Text("Tambahkan Catatan")
                         .fontWeight(.bold)
                         .multilineTextAlignment(.leading)
                     
-                    ZStack(alignment: .topLeading) {
-                        TextEditor(text: $textEditorCatatan)
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 6)
-                                    .stroke(Color(UIColor.systemGray4), lineWidth: 2)
-                            }
-                            .font(.subheadline)
-                        if textEditorCatatan.isEmpty {
-                            Text("Tulis catatan disini")
-                                .foregroundColor(Color(UIColor.systemGray3))
-                                .font(.subheadline)
-                                .padding(.top, 8)
-                                .padding(.leading, 4)
+                    TextEditor(text: $textEditorCatatan)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(Color(UIColor.systemGray4), lineWidth: 2)
                         }
-                    }
+                        .font(.subheadline)
+                    
+//                    ZStack(alignment: .topLeading) {
+                        
+//                        if textEditorCatatan.isEmpty {
+//                            Text("Tulis catatan disini")
+//                                .foregroundColor(Color(UIColor.systemGray3))
+//                                .font(.subheadline)
+//                                .padding(.top, 8)
+//                                .padding(.leading, 4)
+//                        }
+//                    }
                 }
                 .padding(16)
             
@@ -116,22 +124,48 @@ struct AddNewEntryView: View {
                     Button("Save") {
                         // Save logic here
                         
-                        
+                        saveEntry()
                         
                         dismiss()
                     }
+                    .disabled(plateNumber.isEmpty && selectedVehicleType == nil)
                     .bold(true)
                 }
             }
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(Color(.systemBackground), for: .navigationBar)
             .sheet(isPresented: $showScannerSheet) {
-                PlateScannerView()
+                PlateScannerView(plateNumber: $plateNumber)
             }
         }
         
     }
+    
+    private func saveEntry() {
+        
+        let trimmedPlate = plateNumber.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        
+        if let existingCar = cars.first(where: { $0.plate.uppercased() == trimmedPlate }) {
+            let newEntry = Entry(category: existingCar.type, time: Date.now, note: textEditorCatatan)
+            existingCar.entry.append(newEntry)
+            try? modelContext.save()
+            print("Entry added to car \(existingCar.plate)")
+        } else {
+            
+            //TO DISCUSS: normalize data or not
+            let newCar = Car(plate: plateNumber, type: selectedVehicleType ?? "Car")
+            let newEntry = Entry(category: textEditorCategory, time: Date.now, note: textEditorCatatan)
+//            if let image = image {
+//                newEntry.image = image.jpegData(compressionQuality: 0.8)
+//            }
+            newCar.entry.append(newEntry)
+            modelContext.insert(newCar)
+            try? modelContext.save()
+            print("New car created and entry added.")
+        }
+    }
 }
+
 
 #Preview {
     AddNewEntryView()

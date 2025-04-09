@@ -7,10 +7,10 @@ struct GroupedCarList: View {
     let car: [Car]
     
     private var groupedCar: [Date: [Car]] {
-        Dictionary(grouping: car) { car in
-            Calendar.current.startOfDay(for: car.mostRecentEntry)
-        }
+        Dictionary(grouping: car, by: { Calendar.current.startOfDay(for: $0.mostRecentEntry) })
+            .mapValues { $0.sorted(by: { $0.mostRecentEntry > $1.mostRecentEntry }) }
     }
+
     
     private var sectionDates: [Date] {
         groupedCar.keys.sorted(by: >) // sorts by newest first
@@ -104,25 +104,8 @@ struct DashboardCard: View {
 // MARK: - DashboardView
 
 struct DashboardView: View {
-    @State private var cars = [
-        Car(plate: "ABC123", type: "Car", entry: [
-            Entry(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2024, month: 7, day: 27, hour: 7, minute: 30))!, note: "kaca spion pecah"),
-            Entry(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2024, month: 7, day: 28, hour: 7, minute: 45))!, note: "kaca spion pecah")
-        ]),
-        Car(plate: "DEF456", type: "Bike", entry: [
-            Entry(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2024, month: 7, day: 27, hour: 8, minute: 30))!, note: "spion kanan hilang")
-        ]),
-        Car(plate: "GHI789", type: "Car", entry: [
-            Entry(category: "Body", time: Calendar.current.date(from: DateComponents(year: 2024, month: 7, day: 20, hour: 9, minute: 30))!, note: "panel pintu lecet")
-        ]),
-        Car(plate: "JKL012", type: "Bike", entry: [
-            Entry(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2024, month: 7, day: 28, hour: 10, minute: 30))!, note: "spion kiri hilang")
-        ]),
-        Car(plate: "MNO993", type: "Bike", entry: [
-            Entry(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2024, month: 7, day: 25, hour: 10, minute: 30))!, note: "spion kiri hilang"),
-            Entry(category: "Side Mirror", time: Calendar.current.date(from: DateComponents(year: 2024, month: 7, day: 29, hour: 10, minute: 30))!, note: "spion kiri hilang")
-        ]),
-    ]
+    
+    @Query var cars: [Car]
     
     var carsSearch: [Car] {
         return cars.filter {
@@ -172,44 +155,27 @@ struct DashboardView: View {
                     }
                     Spacer()
                 }
-                
-                
-                
             }
-            .background(.ultraThinMaterial)
-            .navigationBarTitleDisplayMode(.inline)
-            // Use the default searchable modifier with the isPresented binding.
-            .searchable(text: $searchText, isPresented: $isSearching, placement: .navigationBarDrawer)
             .toolbar {
                 // Principal title remains unchanged.
                 ToolbarItem(placement: .principal) {
                     Text("Dashboard")
                         .font(.system(size: 20, weight: .bold, design: .default))
+                        .foregroundStyle(.black)
                 }
-              
-                
-//                ToolbarItem(placement: .bottomBar) {
-//                    Button {
-//                        // Add new entry logic here.
-//                        showNewEntrySheet = true
-//                    } label: {
-//                        Text("+ Add New Entry")
-//                            .font(.system(size: 19, weight: .bold, design: .default))
-//                            .foregroundStyle(.white)
-//                            .frame(width: 330, height: 36, alignment: .center)
-//                            .background(Color.blue)
-//                            .containerShape(RoundedRectangle(cornerSize: .init(width: 10, height: 10)))
-//                    }
-//                }
             }
-            .toolbarBackground(.visible, for: .navigationBar)
-            .sheet(isPresented: $showNewEntrySheet){
-                AddNewEntryView()
-                    .presentationDetents([.fraction(0.95)])
-            }
+            .background(.ultraThinMaterial)
+            .navigationBarTitleDisplayMode(.inline)
+            // Use the default searchable modifier with the isPresented binding.
+            .searchable(text: $searchText, isPresented: $isSearching, placement: .navigationBarDrawer)
+        }
+        .toolbarBackground(.visible, for: .navigationBar)
+        .sheet(isPresented: $showNewEntrySheet){
+            AddNewEntryView()
+                .presentationDetents([.fraction(0.95)])
         }
         .sheet(isPresented: $showScannerSheet){
-            PlateScannerView()
+            PlateScannerView(plateNumber: $searchText)
                 .presentationDetents([.fraction(0.90)])
         }
     }

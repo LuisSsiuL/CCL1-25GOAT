@@ -2,9 +2,12 @@ import SwiftUI
 
 struct VehicleAddNoteView: View {
     @Environment(\.dismiss) var dismiss  // Dismiss the sheet when done
+    @Environment(\.modelContext) var modelContext
     
-    @State private var category: String = ""
-    @State private var noteText: String = ""
+    var selectedVehicle: Car
+    
+    @State private var textEditorCategory: String = ""
+    @State private var textEditorNote: String = ""
     // Optionally, you can add a state for the photo:
     // @State private var selectedImage: UIImage? = nil
 
@@ -36,7 +39,7 @@ struct VehicleAddNoteView: View {
                 }
                 .padding(.horizontal)
                 
-                TextField("Enter category", text: $category)
+                TextField("Enter category", text: $textEditorCategory)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.horizontal)
                 
@@ -48,7 +51,7 @@ struct VehicleAddNoteView: View {
                 }
                 .padding(.horizontal)
                 
-                TextEditor(text: $noteText)
+                TextEditor(text: $textEditorNote)
                     .frame(height: 150) // Adjust height as needed
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
@@ -72,6 +75,9 @@ struct VehicleAddNoteView: View {
                         ToolbarItem(placement: .navigationBarTrailing) {
                             Button("Done") {
                                 // Save logic here
+                                
+                                saveEntry()
+                                
                                 dismiss()
                             }
                             .bold(true)
@@ -84,8 +90,18 @@ struct VehicleAddNoteView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
     }
+    
+    private func saveEntry() {
+
+        let newEntry = Entry(category: textEditorCategory, time: Date.now, note: textEditorNote)
+        selectedVehicle.entry.append(newEntry)
+        try? modelContext.save()
+        print("Entry added to car \(selectedVehicle.plate)")
+        
+    }
+    
 }
 
 #Preview {
-    VehicleAddNoteView()
+    DashboardView()
 }

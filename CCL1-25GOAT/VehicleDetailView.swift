@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct VehicleDetailCard: View {
-    
     let entry: Entry
 
     var body: some View {
@@ -33,31 +32,17 @@ struct VehicleDetailCard: View {
     }
 }
 
-private func DeleteButton(for entry: Entry) -> some View {
-    Button(role: .destructive) {
-        print("Delete tapped")
-    } label: {
-        Label("Delete", systemImage: "trash")
-    }
-}
-
-private func EditButton(for entry: Entry) -> some View {
-    Button(role: .cancel) {
-        print("Edit tapped")
-    } label: {
-        Label("Edit", systemImage: "pencil")
-    }
-}
-
 struct GroupedEntryView: View {
+    @Environment(\.modelContext) var modelContext
     
     let entry: [Entry]
+    let vehicle: Car
     var headerView: AnyView? = nil
+    @Binding var isLastEntry: Bool
     
     private var groupedEntries: [Date: [Entry]] {
-        Dictionary(grouping: entry) { entry in
-            Calendar.current.startOfDay(for: entry.time)
-        }
+        Dictionary(grouping: entry, by: { Calendar.current.startOfDay(for: $0.time) })
+            .mapValues { $0.sorted(by: { $0.time > $1.time }) }
     }
     
     private var sectionDates: [Date] {
@@ -79,20 +64,32 @@ struct GroupedEntryView: View {
         return AnyView(
             Section(header: entrySectionHeader(for: date)) {
                 ForEach(entry, id: \.self) { entry in
-                    NavigationLink {
-                        
-                    } label: {
-                        VehicleDetailCard(entry: entry)
-                            .swipeActions(edge: .leading) {
-                                EditButton(for: entry)
-                            }
-                            .swipeActions(edge: .trailing) {
-                                DeleteButton(for: entry)
-                            }
-                    }
+                    VehicleDetailCard(entry: entry)
+//                            .swipeActions(edge: .leading) {
+//                                EditButton(for: entry)
+//                            }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            DeleteButton(for: entry)
+                        }
                 }
             }
         )
+    }
+    
+    private func DeleteButton(for entry: Entry) -> some View {
+        Button(role: .destructive) {
+            if (vehicle.entry.count == 1 && vehicle.entry.first === entry) {
+                isLastEntry = true
+            } else { deleteEntry(entry: entry) }
+            print("Delete tapped")
+        } label: {
+            Label("Delete", systemImage: "trash")
+        }
+    }
+    
+    private func deleteEntry(entry: Entry) {
+        modelContext.delete(entry)
+        try? modelContext.save()
     }
     
     var body: some View {
@@ -152,8 +149,10 @@ struct CategoryVehicleDetailView: View {
 }
 
 struct VehicleDetailView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) var dismiss
     
-    let vehicle: Car
+    var vehicle: Car
     @State private var searchText = ""
     @State private var showFilterSheet = false
     @State private var showEditSheet = false
@@ -165,6 +164,9 @@ struct VehicleDetailView: View {
     @State private var entryToDelete: Entry? = nil
     @State private var selectedVehicle: String
     @State private var isDateFilterActive = false // Track if date filter has been applied
+    @State private var isDataChanged: Bool = false
+    @State private var isDeleted: Bool = false
+    @State var isLastEntry: Bool = false
     
     init(vehicle: Car) {
         self.vehicle = vehicle
@@ -200,23 +202,44 @@ struct VehicleDetailView: View {
         let headerView = AnyView(
             VStack(spacing: 0) {
                 HStack {
-                    TextField("Plate Number", text: .constant(vehicle.plate), prompt: Text("Write your plate number"))
+                    TextField("Plate Number", text: $plateNumber, prompt: Text("Write your plate number"))
                         .multilineTextAlignment(.center)
                         .padding(.all, 5)
                         .frame(height: 75)
                         .background(.white)
                         .cornerRadius(5)
                         .font(.largeTitle)
+                        .onChange(of: plateNumber) {
+                            isDataChanged = true
+                        }
                     
-                    CategoryVehicleDetailView(selectedVehicle: $selectedVehicle)
+                    CategoryVehicleDetailView(selectedVehicle: $selectedVehicle).onChange(of: selectedVehicle) {
+                        isDataChanged = true
+                    }
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 10)
                 .background(.ultraThinMaterial)
+                
+                Button {
+                    saveVehicle(vehicle: vehicle)
+                    isDataChanged = false
+                } label: {
+                    Text("Simpan Perubahan")
+                        .font(.system(size: 16, weight: .bold, design: .default))
+                        .foregroundStyle(.white)
+                        .frame(width: 300, height: isDataChanged ? 36 : 0, alignment: .center)
+                        .background(Color.blue)
+                        .containerShape(RoundedRectangle(cornerSize: .init(width: 10, height: 10)))
+                        .opacity(isDataChanged ? 1 : 0)
+                }
+                .disabled(!isDataChanged)
+                .frame(height: isDataChanged ? 36 : 0)
+                .padding(isDataChanged ? 10 : 0)
             }
         )
         
-        GroupedEntryView(entry: filteredEntries, headerView: headerView)
+        GroupedEntryView(entry: filteredEntries, vehicle: vehicle, headerView: headerView, isLastEntry: $isLastEntry)
             .padding(.top)
             .searchable(text: $searchText, placement: .navigationBarDrawer, prompt: "Search categories")
             .toolbar {
@@ -272,18 +295,42 @@ struct VehicleDetailView: View {
                     .presentationDetents([.fraction(0.4)])
             }
             .sheet(isPresented: $showAddNoteSheet) {
-                VehicleAddNoteView()
+                VehicleAddNoteView(selectedVehicle: vehicle)
             }
             .alert("Confirm Deletion?", isPresented: $showDeleteAlert) {
                 Button("Cancel", role: .cancel) {}
                 Button("Delete", role: .destructive) {
                     // Delete logic would go here
+                    deleteVehicle(vehicle: vehicle)
+                    isDeleted = true
+                    dismiss()
                 }
             } message: {
                 Text("Are you sure you want to delete this vehicle?")
             }
+            .alert(isPresented: $isLastEntry) {
+                Alert(title: Text("Delete Vehicle"), message: Text("This will also delete the vehicle entry. Do you want to proceed?"), primaryButton: .default(Text("Proceed"), action: {
+                    
+                    deleteVehicle(vehicle: vehicle)
+                    dismiss()
+                    
+                }), secondaryButton: .cancel())
+            }
     }
+    
+    func deleteVehicle(vehicle: Car) {
+        modelContext.delete(vehicle)
+        try? modelContext.save()
+    }
+    
+    private func saveVehicle(vehicle: Car) {
+        vehicle.plate = plateNumber
+        vehicle.type = selectedVehicle
+        try? modelContext.save()
+    }
+    
 }
+
 #Preview {
     DashboardView()
 }
