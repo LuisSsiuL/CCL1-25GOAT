@@ -10,34 +10,65 @@ import SwiftUI
 struct FilterView: View {
     @Binding var startDate: Date
     @Binding var endDate: Date
-    @Environment(\.dismiss) var dismiss // Dismiss the view when done
-
+    @Binding var isDateFilterActive: Bool
+    @Environment(\.dismiss) var dismiss
+    
     var body: some View {
-        VStack {
-            Text("Select Date Range")
-                .font(.headline)
-                .padding()
-
-            // 📅 Date Pickers
-            DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
-                .datePickerStyle(.compact)
-                .padding()
-
-            DatePicker("End Date", selection: $endDate, in: startDate...Date(), displayedComponents: .date)
-                .datePickerStyle(.compact)
-                .padding()
-
-            Spacer()
-
-            // ✅ Apply Filter Button
-            Button("Apply Filter") {
-                dismiss()  // Close the view and return to VehicleDetailView
+        NavigationView {
+            VStack(spacing: 20) {
+                DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
+                    .datePickerStyle(.compact)
+                
+                DatePicker("End Date", selection: $endDate, displayedComponents: .date)
+                    .datePickerStyle(.compact)
+                
+                Toggle("Apply Date Filter", isOn: $isDateFilterActive)
+                    .padding(.top)
+                
+//                HStack {
+//                    Button("Clear Filter") {
+//                        isDateFilterActive = false
+//                        // Reset dates to defaults if needed
+//                        startDate = Calendar.current.date(byAdding: .day, value: -7, to: Date()) ?? Date()
+//                        endDate = Date()
+//                        dismiss()
+//                    }
+//                    .foregroundColor(.red)
+//                    .padding()
+//                    .background(Color.red.opacity(0.1))
+//                    .cornerRadius(8)
+//                    
+//                    Spacer()
+//                    
+//                    Button("Apply") {
+//                        // The toggle already updates isDateFilterActive
+//                        dismiss()
+//                    }
+//                    .foregroundColor(.white)
+//                    .padding()
+//                    .background(Color.blue)
+//                    .cornerRadius(8)
+//                }
+                .padding(.top)
+                
+                Spacer()
             }
-            .buttonStyle(.borderedProminent)
             .padding()
+            .navigationTitle("Date Filter")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+
+            }
         }
-        .navigationTitle("Filter Entries")
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
-

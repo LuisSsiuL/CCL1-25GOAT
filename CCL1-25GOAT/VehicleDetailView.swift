@@ -155,15 +155,16 @@ struct VehicleDetailView: View {
     
     let vehicle: Car
     @State private var searchText = ""
-    @State private var showFilterSheet = false  // Show/hide the filter modal
+    @State private var showFilterSheet = false
     @State private var showEditSheet = false
     @State private var showAddNoteSheet = false
     @State private var showDeleteAlert = false
-    @State private var startDate = Calendar.current.date(byAdding: .day, value: -7, to: Date()) ?? Date() // Default: 7 days ago
-    @State private var endDate = Date() // Default: Today
+    @State private var startDate = Calendar.current.date(byAdding: .day, value: -7, to: Date()) ?? Date()
+    @State private var endDate = Date()
     @State private var plateNumber: String
     @State private var entryToDelete: Entry? = nil
     @State private var selectedVehicle: String
+    @State private var isDateFilterActive = false // Track if date filter has been applied
     
     init(vehicle: Car) {
         self.vehicle = vehicle
@@ -172,12 +173,27 @@ struct VehicleDetailView: View {
         _selectedVehicle = State(initialValue: vehicle.type)
     }
     
-    var filteredEntries: [Date: [Entry]] {
-        vehicle.groupedEntries
-            .mapValues { $0.filter { entry in
+    // First filter entries by date range (only if date filter is active)
+    private var dateFilteredEntries: [Entry] {
+        if isDateFilterActive {
+            return vehicle.entry.filter { entry in
                 entry.time >= startDate && entry.time <= endDate
-            }}
-            .filter { !$0.value.isEmpty }
+            }
+        } else {
+            return vehicle.entry // Return all entries if filter is not active
+        }
+    }
+    
+    // Then filter date-filtered entries by search text
+    private var filteredEntries: [Entry] {
+        if searchText.isEmpty {
+            return dateFilteredEntries
+        } else {
+            return dateFilteredEntries.filter { entry in
+                entry.category.localizedCaseInsensitiveContains(searchText) ||
+                entry.note.localizedCaseInsensitiveContains(searchText)
+            }
+        }
     }
 
     var body: some View {
@@ -200,18 +216,25 @@ struct VehicleDetailView: View {
             }
         )
         
-        GroupedEntryView(entry: vehicle.entry, headerView: headerView)
+        GroupedEntryView(entry: filteredEntries, headerView: headerView)
             .padding(.top)
             .searchable(text: $searchText, placement: .navigationBarDrawer, prompt: "Search categories")
             .toolbar {
-
-                
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button {
                         showFilterSheet = true
                     } label: {
                         Image(systemName: "line.3.horizontal.decrease.circle")
-                            .foregroundColor(.blue)
+                            .foregroundColor(isDateFilterActive ? .blue.opacity(0.7) : .blue)
+                            .overlay {
+                                // Show indicator dot if filter is active
+                                if isDateFilterActive {
+                                    Circle()
+                                        .fill(.blue)
+                                        .frame(width: 8, height: 8)
+                                        .offset(x: 8, y: -8)
+                                }
+                            }
                     }
                     
                     Button {
@@ -236,8 +259,13 @@ struct VehicleDetailView: View {
                 }
             }
             .sheet(isPresented: $showFilterSheet) {
-                FilterView(startDate: $startDate, endDate: $endDate)
-                    .presentationDetents([.fraction(0.4)])
+                FilterView(
+                    startDate: $startDate,
+                    endDate: $endDate,
+                    isDateFilterActive: $isDateFilterActive
+                )
+                .presentationDetents([.fraction(0.4)])
+                
             }
             .sheet(isPresented: $showEditSheet) {
                 VehicleEditView(plateNumber: $plateNumber)
@@ -256,7 +284,6 @@ struct VehicleDetailView: View {
             }
     }
 }
-
 #Preview {
     DashboardView()
 }
