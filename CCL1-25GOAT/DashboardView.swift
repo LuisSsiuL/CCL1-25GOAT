@@ -169,7 +169,7 @@ struct DashboardView: View {
                 }
             }
             .background(.ultraThinMaterial)
-            .navigationBarTitleDisplayMode(.inline)
+//            .navigationBarTitleDisplayMode(.inline)
             // Use the default searchable modifier with the isPresented binding.
             .searchable(text: $searchText, isPresented: $isSearching, placement: .navigationBarDrawer)
             .toolbar {

@@ -6,9 +6,12 @@ struct PlateScannerView: View {
     
     @Environment(\.dismiss) var dismiss
     
+    var addNewEntryView = AddNewEntryView()
     @State private var recognizedText: String = "Menunggu hasil scan..."
-    @State private var presentedText: String?
-    @State private var isPresented: Bool = false
+    @State var presentedText: String = "No Text Found"
+    @State var isPresentedPlateDetected: Bool = false
+    @State var isPresentedPlateNotDetected: Bool = false
+    @State var isNewEntry: Bool = false
     
     var body: some View {
         
@@ -18,7 +21,7 @@ struct PlateScannerView: View {
                 CameraView(recognizedText: $recognizedText)
                     .edgesIgnoringSafeArea(.all)
                     .onAppear {
-                        CameraView.init(recognizedText: $recognizedText).requestCameraPermission()
+                        CameraView(recognizedText: $recognizedText).requestCameraPermission()
                     }
                 
                 Text("Plat Nomor Terdeteksi:")
@@ -29,11 +32,15 @@ struct PlateScannerView: View {
                     .font(.headline)
                 
                 Button {
-                    isPresented = true
+                    
                     presentedText = recognizedText
-                    
-                    // presentedText will be passed back to New Entry Page
-                    
+                    if (presentedText == "Menunggu hasil scan..." || presentedText == "No Text Found") {
+                        isPresentedPlateNotDetected = true
+                    } else {
+                        isPresentedPlateDetected = true
+                        print("detected: \(isPresentedPlateDetected)")
+                    }
+                    print("Alert triggered: \(presentedText)")
                 } label: {
                     Image(systemName: "inset.filled.circle")
                         .resizable()
@@ -41,9 +48,26 @@ struct PlateScannerView: View {
                         .frame(width: 80, height: 80)
                         .foregroundColor(.blue)
                 }
-                // ALERT IS PLACEHOLDER
-                .alert(isPresented: $isPresented) {
-                    Alert(title: Text("Captured Text"), message: Text(presentedText ?? "???"), dismissButton: .cancel())
+                .alert(isPresented: $isPresentedPlateDetected) {
+                    print("is detected")
+//                    if (isNewEntry == true) {
+//                        Alert(title: Text("Create New Entry"), message: Text("\(String(describing: presentedText)) has not been registered. Create new entry?"), primaryButton: .default(Text("Create"), action: {
+//                            // pass data to addnewentry
+//                            addNewEntryView.plateNumber = presentedText
+//                            dismiss()
+//                        }), secondaryButton: .cancel(Text("Cancel"))
+//                        )
+//                    } else {
+                        return Alert(title: Text("Proceed With Scan"), message: Text("Number plate is detected as: \(String(describing: presentedText)). Continue?"), primaryButton: .default(Text("Continue"), action: {
+                            // pass data to addnewentry
+                            dismiss()
+                        })
+                              , secondaryButton: .cancel(Text("Cancel"))
+                        )
+//                    }
+                }
+                .alert(isPresented: $isPresentedPlateNotDetected) {
+                    Alert(title: Text("Plate Not Detected"), message: Text("Direct the camera to the vehicle's number plate"), dismissButton: .default(Text("Try Again")))
                 }
                 .toolbar {
                     ToolbarItem(placement: .principal) {
@@ -95,7 +119,7 @@ struct CameraView: UIViewRepresentable {
             self.parent = parent
         }
         
-        func captureOutput(_ output: AVCaptureOutput, didDrop sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
             guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
             
             recognizeText(in: pixelBuffer)
@@ -103,7 +127,7 @@ struct CameraView: UIViewRepresentable {
         
         private func recognizeText(in image: CVPixelBuffer) {
             
-            let requestHandler = VNImageRequestHandler(cvPixelBuffer: image, options: [:])
+            let requestHandler = VNImageRequestHandler(ciImage: CIImage(cvPixelBuffer: image), options: [:])
             
             let textRecognitionRequest = VNRecognizeTextRequest { request, error in
                 
@@ -162,6 +186,15 @@ class CameraUIView: UIView {
             return
         }
         
+        let videoDataOutput = AVCaptureVideoDataOutput()
+        videoDataOutput.setSampleBufferDelegate(sessionDelegate, queue: DispatchQueue(label: "com.example.camera-preview-delegate-queue"))
+        
+        if (captureSession?.canAddOutput(videoDataOutput) == true) {
+            captureSession?.addOutput(videoDataOutput)
+        } else {
+            return
+        }
+        
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession!)
         previewLayer?.frame = bounds
         self.layer.addSublayer(previewLayer!)
@@ -180,5 +213,5 @@ class CameraUIView: UIView {
 }
 
 #Preview {
-    PlateScannerView()
+    DashboardView()
 }
