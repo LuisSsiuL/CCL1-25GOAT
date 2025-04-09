@@ -14,7 +14,7 @@ struct AddNewEntryView: View {
     @State private var selectedCar: Car?
 
     @State private var plateNumber: String = ""
-    @State private var selectedVehicleType: String? = nil
+    @State private var selectedVehicleType: String = ""
     @State private var textEditorCatatan: String = ""
     @State private var textEditorCategory: String = ""
     @State private var showScannerSheet = false
@@ -46,7 +46,7 @@ struct AddNewEntryView: View {
                             saveEntry()
                             dismiss()
                         }
-                        .disabled(plateNumber.isEmpty && selectedVehicleType == nil)
+                        .disabled(plateNumber.isEmpty && selectedVehicleType == "")
                         .bold()
                     }
                 }
@@ -55,10 +55,11 @@ struct AddNewEntryView: View {
                 }
                 
             }
+            .onTapGesture {
+                focusedField = nil
+            }
         }
-        .onTapGesture {
-            focusedField = nil
-        }
+        
     }
 
     private var plateNumberSection: some View {
@@ -159,7 +160,7 @@ struct AddNewEntryView: View {
             existingCar.entry.append(newEntry)
             try? modelContext.save()
         } else {
-            let newCar = Car(plate: trimmedPlate, type: selectedVehicleType ?? "Car")
+            let newCar = Car(plate: trimmedPlate, type: selectedVehicleType)
             let newEntry = Entry(category: textEditorCategory, time: Date.now, note: textEditorCatatan)
             newCar.entry.append(newEntry)
             modelContext.insert(newCar)
@@ -191,8 +192,8 @@ struct VehicleTypeChooser: View {
                     Text("Motor")
                 }
                 .frame(width: 150, height: 150)
-                .foregroundColor(selectedVehicleType == "Motor" ? .white : Color(UIColor.systemGray3))
-                .background(selectedVehicleType == "Motor" ? .blue : .clear)
+                .foregroundColor(selectedVehicleType == "Bike" ? .white : Color(UIColor.systemGray3))
+                .background(selectedVehicleType == "Bike" ? .blue : .clear)
                 .cornerRadius(15)
                 .overlay {
                     RoundedRectangle(cornerRadius: 15)
@@ -200,7 +201,7 @@ struct VehicleTypeChooser: View {
                 }
                 .onTapGesture {
                     withAnimation {
-                        selectedVehicleType = (selectedVehicleType == "Motor") ? nil : "Motor"
+                        selectedVehicleType = (selectedVehicleType == "Bike") ? nil : "Bike"
                     }
                 }
                 
@@ -210,8 +211,8 @@ struct VehicleTypeChooser: View {
                     Text("Mobil")
                 }
                 .frame(width: 150, height: 150)
-                .foregroundColor(selectedVehicleType == "Mobil" ? .white : Color(UIColor.systemGray3))
-                .background(selectedVehicleType == "Mobil" ? .blue : .clear)
+                .foregroundColor(selectedVehicleType == "Car" ? .white : Color(UIColor.systemGray3))
+                .background(selectedVehicleType == "Car" ? .blue : .clear)
                 .cornerRadius(15)
                 .overlay {
                     RoundedRectangle(cornerRadius: 15)
@@ -219,7 +220,7 @@ struct VehicleTypeChooser: View {
                 }
                 .onTapGesture {
                     withAnimation {
-                        selectedVehicleType = (selectedVehicleType == "Mobil") ? nil : "Mobil"
+                        selectedVehicleType = (selectedVehicleType == "Car") ? nil : "Car"
                     }
                 }
             }
