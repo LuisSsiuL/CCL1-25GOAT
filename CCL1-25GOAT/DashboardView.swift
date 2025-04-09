@@ -191,9 +191,9 @@ struct DashboardView: View {
             AddNewEntryView()
                 .presentationDetents([.fraction(0.95)])
         }
-        .sheet(isPresented: $showScannerSheet){
+        .fullScreenCover(isPresented: $showScannerSheet){
             PlateScannerView(plateNumber: $searchText)
-                .presentationDetents([.fraction(0.90)])
+               
         }
         .sheet(isPresented: $showFilterSheet) {
             VehicleTypeFilterView(filterVehicleType: $filterVehicleType)

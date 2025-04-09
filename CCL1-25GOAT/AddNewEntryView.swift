@@ -50,8 +50,9 @@ struct AddNewEntryView: View {
                         .bold()
                     }
                 }
-                .sheet(isPresented: $showScannerSheet) {
+                .fullScreenCover(isPresented: $showScannerSheet) {
                     PlateScannerView(plateNumber: $plateNumber)
+                        
                 }
                 
             }
