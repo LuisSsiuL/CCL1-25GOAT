@@ -78,8 +78,11 @@ struct DashboardCard: View {
                     Text(latestEntry.category)
                         .font(.footnote)
                     Text(latestEntry.note)
+                        .frame(width: 100, alignment: .leading)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
                     Spacer()
                 }
                 HStack {
