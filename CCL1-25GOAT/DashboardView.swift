@@ -105,10 +105,18 @@ struct DashboardCard: View {
 
 struct DashboardView: View {
     
+    @State var filterVehicleType: String = ""
+    
     @Query var cars: [Car]
     
-    var carsSearch: [Car] {
+    var carsFilter: [Car] {
         return cars.filter {
+            $0.type == filterVehicleType || filterVehicleType.isEmpty
+        }
+    }
+    
+    var carsSearch: [Car] {
+        return carsFilter.filter {
             $0.plate.lowercased().contains(searchText.lowercased())
         }
     }
@@ -118,6 +126,7 @@ struct DashboardView: View {
     @State private var isSearching: Bool = false
     @State private var showNewEntrySheet: Bool = false
     @State private var showScannerSheet: Bool = false
+    @State private var showFilterSheet: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -140,7 +149,7 @@ struct DashboardView: View {
                         .scrollContentBackground(.hidden)
                         
                 } else {
-                    GroupedCarList(car: cars)
+                    GroupedCarList(car: carsFilter)
                         .scrollContentBackground(.hidden)
                     Button {
                         // Add new entry logic here.
@@ -163,6 +172,14 @@ struct DashboardView: View {
                         .font(.system(size: 20, weight: .bold, design: .default))
                         .foregroundStyle(.black)
                 }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showFilterSheet = true
+                    } label: {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                            .foregroundStyle(Color.blue)
+                    }
+                }
             }
             .background(.ultraThinMaterial)
             .navigationBarTitleDisplayMode(.inline)
@@ -177,6 +194,10 @@ struct DashboardView: View {
         .sheet(isPresented: $showScannerSheet){
             PlateScannerView(plateNumber: $searchText)
                 .presentationDetents([.fraction(0.90)])
+        }
+        .sheet(isPresented: $showFilterSheet) {
+            VehicleTypeFilterView(filterVehicleType: $filterVehicleType)
+                .presentationDetents([.fraction(0.21)])
         }
     }
 }
