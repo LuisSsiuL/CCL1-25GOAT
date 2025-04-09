@@ -9,7 +9,7 @@ struct AddNewEntryView: View {
     
     @State var plateNumber: String = ""
     @Environment(\.dismiss) var dismiss
-    @State var selectedVehicleType: String? = nil
+    @State var selectedVehicleType: String = ""
     @State private var textEditorCatatan: String = ""
     @State private var textEditorCategory: String = ""  // New state for category text field
     @State private var showNewEntrySheet = false
@@ -128,7 +128,7 @@ struct AddNewEntryView: View {
                         
                         dismiss()
                     }
-                    .disabled(plateNumber.isEmpty && selectedVehicleType == nil)
+                    .disabled(plateNumber.isEmpty && selectedVehicleType == "")
                     .bold(true)
                 }
             }
@@ -153,7 +153,7 @@ struct AddNewEntryView: View {
         } else {
             
             //TO DISCUSS: normalize data or not
-            let newCar = Car(plate: plateNumber, type: selectedVehicleType ?? "Car")
+            let newCar = Car(plate: plateNumber, type: selectedVehicleType)
             let newEntry = Entry(category: textEditorCategory, time: Date.now, note: textEditorCatatan)
 //            if let image = image {
 //                newEntry.image = image.jpegData(compressionQuality: 0.8)
@@ -162,6 +162,7 @@ struct AddNewEntryView: View {
             modelContext.insert(newCar)
             try? modelContext.save()
             print("New car created and entry added.")
+            selectedVehicleType = ""
         }
     }
 }
