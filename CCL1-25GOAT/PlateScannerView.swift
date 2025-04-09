@@ -7,7 +7,7 @@ struct PlateScannerView: View {
     @Environment(\.dismiss) var dismiss
     
     @State private var recognizedText: String = "Menunggu hasil scan..."
-    @State var presentedText: String = "No Text Found"
+    @State var presentedText: String = "Tidak terdeteksi plat"
     @State var isPresentedPlateDetected: Bool = false
     @State var isPresentedPlateNotDetected: Bool = false
     @State var isNewEntry: Bool = false
@@ -36,7 +36,7 @@ struct PlateScannerView: View {
                 Button {
                     
                     presentedText = recognizedText
-                    if (presentedText == "Menunggu hasil scan..." || presentedText == "No Text Found") {
+                    if (presentedText == "Menunggu hasil scan..." || presentedText == "Tidak terdeteksi plat") {
                         isPresentedPlateNotDetected = true
                     } else {
                         isPresentedPlateDetected = true
@@ -51,11 +51,11 @@ struct PlateScannerView: View {
                         .foregroundColor(.blue)
                 }
                 .alert(isPresented: $isPresentedPlateNotDetected) {
-                    Alert(title: Text("Plate Not Detected"), message: Text("Direct the camera to the vehicle's number plate"), dismissButton: .default(Text("Try Again")))
+                    Alert(title: Text("Plat Tidak Terdeteksi"), message: Text("Arahkan kamera ke plat nomor kendaraan"), dismissButton: .default(Text("Coba Lagi")))
                 }
                 .toolbar {
                     ToolbarItem(placement: .principal) {
-                        Text("Scanner").font(.headline).foregroundStyle(Color.white)
+                        Text("Pemindai Plat").font(.headline).foregroundStyle(Color.white)
                     }
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button {
@@ -73,11 +73,11 @@ struct PlateScannerView: View {
         }
         .alert(isPresented: $isPresentedPlateDetected) {
             print("is detected")
-            return Alert(title: Text("Proceed With Scan"), message: Text("Number plate is detected as: \(String(describing: presentedText)). Continue?"), primaryButton: .default(Text("Continue"), action: {
+            return Alert(title: Text("Lanjutkan dengan Hasil Scan"), message: Text("Number plate terdeteksi sebagai: \(String(describing: presentedText)). Lanjutkan?"), primaryButton: .default(Text("Lanjut"), action: {
                 // pass data to addnewentry
                 plateNumber = presentedText
                 dismiss()
-            }), secondaryButton: .cancel(Text("Cancel"))
+            }), secondaryButton: .cancel(Text("Kembali"))
             )
         }
     }
@@ -132,7 +132,7 @@ struct CameraView: UIViewRepresentable {
                 let bestObservation = results.first ?? VNRecognizedTextObservation()
                 
                 DispatchQueue.main.async {
-                    self.parent.recognizedText = bestObservation.topCandidates(1).first?.string ?? "No Text Found"
+                    self.parent.recognizedText = bestObservation.topCandidates(1).first?.string ?? "Tidak terdeteksi plat"
                 }
             }
             

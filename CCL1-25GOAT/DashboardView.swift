@@ -86,7 +86,7 @@ struct DashboardCard: View {
                     Spacer()
                 }
                 HStack {
-                    Text("Note posted \(relativeTimeString(from: cars.mostRecentEntry))")
+                    Text(relativeTimeString(from: cars.mostRecentEntry))
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                     Spacer()
@@ -137,20 +137,24 @@ struct DashboardView: View {
                 // Conditional content – if search is active, show search view; otherwise, show main content.
                 if isSearching {
                     
-                    Button {
-                        showScannerSheet = true
-                    } label: {
-                        Text("Search by Scan")
-                            .font(.system(size: 19, weight: .bold, design: .default))
-                            .foregroundStyle(.white)
-                            .frame(width: 360, height: 36, alignment: .center)
-                            .background(Color.blue)
-                            .containerShape(RoundedRectangle(cornerSize: .init(width: 10, height: 10)))
-                    }
-                    .padding(.all)
-                    GroupedCarList(car: carsSearch)
-                        .scrollContentBackground(.hidden)
+                    VStack {
+                        Button {
+                            showScannerSheet = true
+                        } label: {
+                            Text("Pindai Plat Nomor")
+                                .font(.system(size: 19, weight: .bold, design: .default))
+                                .foregroundStyle(.white)
+                                .frame(width: 360, height: 36, alignment: .center)
+                                .background(Color.blue)
+                                .containerShape(RoundedRectangle(cornerSize: .init(width: 10, height: 10)))
+                        }
+                        .padding(.all)
                         
+                        GroupedCarList(car: carsSearch)
+                            .scrollContentBackground(.hidden)
+                    }
+                    .transition(.move(edge: .top))
+                    .animation(.easeInOut, value: isSearching)
                 } else {
                     GroupedCarList(car: carsFilter)
                         .scrollContentBackground(.hidden)
@@ -158,7 +162,7 @@ struct DashboardView: View {
                         // Add new entry logic here.
                         showNewEntrySheet = true
                     } label: {
-                        Text("+ Add New Entry")
+                        Text("+ Tambah Catatan Baru")
                             .font(.system(size: 19, weight: .bold, design: .default))
                             .foregroundStyle(.white)
                             .frame(width: 330, height: 36, alignment: .center)
@@ -187,7 +191,7 @@ struct DashboardView: View {
             .background(.ultraThinMaterial)
             .navigationBarTitleDisplayMode(.inline)
             // Use the default searchable modifier with the isPresented binding.
-            .searchable(text: $searchText, isPresented: $isSearching, placement: .navigationBarDrawer)
+            .searchable(text: $searchText, isPresented: $isSearching, placement: .navigationBarDrawer, prompt: "Cari berdasarkan plat kendaraan...")
         }
         .toolbarBackground(.visible, for: .navigationBar)
         .sheet(isPresented: $showNewEntrySheet){

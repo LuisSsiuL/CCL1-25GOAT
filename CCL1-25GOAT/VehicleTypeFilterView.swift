@@ -9,7 +9,7 @@ struct VehicleTypeFilterView: View {
         
         VStack {
             HStack {
-                Text("Filter By Vehicle Type")
+                Text("Filter Berdasarkan Jenis Kendaraan")
                 Spacer()
             }.padding([.horizontal])
             
@@ -24,7 +24,7 @@ struct VehicleTypeFilterView: View {
             Button {
                 dismiss()
             } label: {
-                Text("Done")
+                Text("Selesai")
                     .font(.system(size: 19, weight: .bold, design: .default))
                     .foregroundStyle(.white)
                     .frame(width: 330, height: 36, alignment: .center)

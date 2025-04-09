@@ -202,7 +202,7 @@ struct VehicleDetailView: View {
         let headerView = AnyView(
             VStack(spacing: 0) {
                 HStack {
-                    TextField("Plate Number", text: $plateNumber, prompt: Text("Write your plate number"))
+                    TextField("Plate Number", text: $plateNumber, prompt: Text("Masukkan plat nomor kendaraan"))
                         .multilineTextAlignment(.center)
                         .padding(.all, 5)
                         .frame(height: 75)
@@ -241,7 +241,7 @@ struct VehicleDetailView: View {
         
         GroupedEntryView(entry: filteredEntries, vehicle: vehicle, headerView: headerView, isLastEntry: $isLastEntry)
             .padding(.top)
-            .searchable(text: $searchText, placement: .navigationBarDrawer, prompt: "Search categories")
+            .searchable(text: $searchText, placement: .navigationBarDrawer, prompt: "Cari catatan")
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button {
@@ -273,7 +273,7 @@ struct VehicleDetailView: View {
                         // Add new note logic
                         showAddNoteSheet = true
                     } label: {
-                        Text("+ Add New Note").font(.system(size: 19, weight: .bold, design: .default))
+                        Text("+ Tambahkan Catatan Baru").font(.system(size: 19, weight: .bold, design: .default))
                             .foregroundStyle(.white)
                             .frame(width: 330, height: 36, alignment: .center)
                             .background(Color.blue)
@@ -298,24 +298,24 @@ struct VehicleDetailView: View {
                 VehicleAddNoteView(selectedVehicle: vehicle)
                     .presentationDetents([.fraction(0.5)])
             }
-            .alert("Confirm Deletion?", isPresented: $showDeleteAlert) {
-                Button("Cancel", role: .cancel) {}
-                Button("Delete", role: .destructive) {
+            .alert("Hapus Kendaraan?", isPresented: $showDeleteAlert) {
+                Button("Batal", role: .cancel) {}
+                Button("Hapus", role: .destructive) {
                     // Delete logic would go here
                     deleteVehicle(vehicle: vehicle)
                     isDeleted = true
                     dismiss()
                 }
             } message: {
-                Text("Are you sure you want to delete this vehicle?")
+                Text("Apakah anda yakin ingin menghapus data kendaraan ini?")
             }
             .alert(isPresented: $isLastEntry) {
-                Alert(title: Text("Delete Vehicle"), message: Text("This will also delete the vehicle entry. Do you want to proceed?"), primaryButton: .default(Text("Proceed"), action: {
+                Alert(title: Text("Hapus Catatan"), message: Text("Catatan ini adalah satu-satunya data untuk kendaraan ini. Menghapusnya berarti seluruh informasi kendaraan akan ikut terhapus. Tetap lanjutkan?"), primaryButton: .default(Text("Lanjut"), action: {
                     
                     deleteVehicle(vehicle: vehicle)
                     dismiss()
                     
-                }), secondaryButton: .cancel())
+                }), secondaryButton: .cancel(Text("Batal")))
             }
     }
     

@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct VehicleAddNoteView: View {
+    
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
 
@@ -21,13 +22,13 @@ struct VehicleAddNoteView: View {
             VStack(spacing: 20) {
                 // Category Field
                 HStack {
-                    Text("Category:")
+                    Text("Kategori:")
                         .font(.headline)
                     Spacer()
                 }
                 .padding(.horizontal)
 
-                TextField("Enter category", text: $textEditorCategory)
+                TextField("Kerusakan / Kehilangan / dll.", text: $textEditorCategory)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.horizontal)
                     .focused($focusedField, equals: .category)
@@ -38,7 +39,7 @@ struct VehicleAddNoteView: View {
 
                 // Note Field with TextEditor
                 HStack {
-                    Text("Note:")
+                    Text("Catatan:")
                         .font(.headline)
                     Spacer()
                 }
@@ -56,17 +57,17 @@ struct VehicleAddNoteView: View {
                 Spacer()
             }
             .padding(.vertical)
-            .navigationTitle("Add New Note")
+            .navigationTitle("Catatan Baru")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
+                    Button("Batal") {
                         dismiss()
                     }
                 }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                    Button("Simpan") {
                         saveEntry()
                         dismiss()
                     }
@@ -74,11 +75,11 @@ struct VehicleAddNoteView: View {
                     .disabled(textEditorCategory.isEmpty && textEditorNote.isEmpty)
                 }
             }
-            
+            .onTapGesture {
+                focusedField = nil // dismiss keyboard
+            }
         }
-        .onTapGesture {
-            focusedField = nil // dismiss keyboard
-        }
+        
     }
 
     private func saveEntry() {

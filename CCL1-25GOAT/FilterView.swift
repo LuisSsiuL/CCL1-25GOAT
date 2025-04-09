@@ -16,17 +16,17 @@ struct FilterView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
-                DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
+                DatePicker("Mulai Tanggal", selection: $startDate, displayedComponents: .date)
                     .datePickerStyle(.compact)
                 
-                DatePicker("End Date", selection: $endDate, displayedComponents: .date)
+                DatePicker("Akhir Tanggal", selection: $endDate, displayedComponents: .date)
                     .datePickerStyle(.compact)
                 Button {
                     // Add new entry logic here.
                     isDateFilterActive = true
                     dismiss()
                 } label: {
-                    Text("Apply Filter")
+                    Text("Terapkan filter")
                         .font(.system(size: 19, weight: .bold, design: .default))
                         .foregroundStyle(.white)
                         .frame(width: 330, height: 36, alignment: .center)
@@ -65,11 +65,11 @@ struct FilterView: View {
                 Spacer()
             }
             .padding()
-            .navigationTitle("Date Filter")
+            .navigationTitle("Filter Tanggal")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Clear") {
+                    Button("Hapus") {
                         isDateFilterActive = false
                         dismiss()
                     }

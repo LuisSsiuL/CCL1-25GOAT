@@ -32,17 +32,17 @@ struct AddNewEntryView: View {
                 }
                 .padding(.bottom, 30)
                 .padding(.top, 16)
-                .navigationTitle("Entry Baru")
+                .navigationTitle("Catatan Baru")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
-                        Button("Cancel") {
+                        Button("Batal") {
                             dismiss()
                         }.tint(.blue)
                     }
 
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Button("Save") {
+                        Button("Simpan") {
                             saveEntry()
                             dismiss()
                         }
@@ -69,7 +69,7 @@ struct AddNewEntryView: View {
                 Form {
                     Text("Plat Nomor Kendaraan")
                         .fontWeight(.bold)
-                    TextField("Plate Number", text: $plateNumber)
+                    TextField("cth. B 1234 ABC", text: $plateNumber)
                         .focused($focusedField, equals: .plateNumber)
                         .onSubmit { focusedField = .category }
                         .padding()
@@ -102,12 +102,12 @@ struct AddNewEntryView: View {
 
     private var categorySection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Tambahkan Category")
+            Text("Kategori")
                 .fontWeight(.bold)
 
             ZStack(alignment: .leading) {
                 if textEditorCategory.isEmpty {
-                    Text("Tulis category disini")
+                    Text("Kerusakan / Kehilangan / dll.")
                         .foregroundColor(Color(UIColor.systemGray3))
                         .padding(8)
                 }
@@ -127,7 +127,7 @@ struct AddNewEntryView: View {
 
     private var catatanSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Tambahkan Catatan")
+            Text("Catatan")
                 .fontWeight(.bold)
 
             ZStack(alignment: .topLeading) {
@@ -182,7 +182,7 @@ struct VehicleTypeChooser: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Pilih Kendaraan")
+            Text("Pilih Jenis Kendaraan")
                 .fontWeight(.bold)
                 .multilineTextAlignment(.leading)
             
