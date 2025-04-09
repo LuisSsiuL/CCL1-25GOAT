@@ -125,18 +125,11 @@ struct DashboardView: View {
     ]
     
     var carsSearch: [Car] {
-        guard !searchText.isEmpty else {
-            return cars
-        }
         return cars.filter {
             $0.plate.lowercased().contains(searchText.lowercased())
         }
     }
-    var carsSearch2: [Car] {
-        return cars.filter {
-            $0.plate.lowercased().contains(searchText.lowercased())
-        }
-    }
+  
     
     @State var searchText: String = ""
     @State private var isSearching: Bool = false
@@ -160,27 +153,12 @@ struct DashboardView: View {
                             .containerShape(RoundedRectangle(cornerSize: .init(width: 10, height: 10)))
                     }
                     .padding(.all)
-                    GroupedCarList(car: carsSearch2)
+                    GroupedCarList(car: carsSearch)
                         .scrollContentBackground(.hidden)
                         
                 } else {
                     GroupedCarList(car: cars)
                         .scrollContentBackground(.hidden)
-                }
-            }
-            .background(.ultraThinMaterial)
-            .navigationBarTitleDisplayMode(.inline)
-            // Use the default searchable modifier with the isPresented binding.
-            .searchable(text: $searchText, isPresented: $isSearching, placement: .navigationBarDrawer)
-            .toolbar {
-                // Principal title remains unchanged.
-                ToolbarItem(placement: .principal) {
-                    Text("Dashboard")
-                        .font(.system(size: 20, weight: .bold, design: .default))
-                }
-                // Removed scan and search toggle buttons.
-                // Bottom bar with "Add New Entry" button.
-                ToolbarItem(placement: .bottomBar) {
                     Button {
                         // Add new entry logic here.
                         showNewEntrySheet = true
@@ -192,7 +170,37 @@ struct DashboardView: View {
                             .background(Color.blue)
                             .containerShape(RoundedRectangle(cornerSize: .init(width: 10, height: 10)))
                     }
+                    Spacer()
                 }
+                
+                
+                
+            }
+            .background(.ultraThinMaterial)
+            .navigationBarTitleDisplayMode(.inline)
+            // Use the default searchable modifier with the isPresented binding.
+            .searchable(text: $searchText, isPresented: $isSearching, placement: .navigationBarDrawer)
+            .toolbar {
+                // Principal title remains unchanged.
+                ToolbarItem(placement: .principal) {
+                    Text("Dashboard")
+                        .font(.system(size: 20, weight: .bold, design: .default))
+                }
+              
+                
+//                ToolbarItem(placement: .bottomBar) {
+//                    Button {
+//                        // Add new entry logic here.
+//                        showNewEntrySheet = true
+//                    } label: {
+//                        Text("+ Add New Entry")
+//                            .font(.system(size: 19, weight: .bold, design: .default))
+//                            .foregroundStyle(.white)
+//                            .frame(width: 330, height: 36, alignment: .center)
+//                            .background(Color.blue)
+//                            .containerShape(RoundedRectangle(cornerSize: .init(width: 10, height: 10)))
+//                    }
+//                }
             }
             .toolbarBackground(.visible, for: .navigationBar)
             .sheet(isPresented: $showNewEntrySheet){
