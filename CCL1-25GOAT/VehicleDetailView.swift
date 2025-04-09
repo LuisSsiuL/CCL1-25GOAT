@@ -296,6 +296,7 @@ struct VehicleDetailView: View {
             }
             .sheet(isPresented: $showAddNoteSheet) {
                 VehicleAddNoteView(selectedVehicle: vehicle)
+                    .presentationDetents([.fraction(0.5)])
             }
             .alert("Confirm Deletion?", isPresented: $showDeleteAlert) {
                 Button("Cancel", role: .cancel) {}

@@ -3,168 +3,171 @@ import SwiftData
 
 struct AddNewEntryView: View {
     
+    enum ForumFields: Int, Hashable {
+        case plateNumber = 0
+        case category
+        case catetan
+    }
+
     @Environment(\.modelContext) var modelContext
     @Query var cars: [Car]
     @State private var selectedCar: Car?
-    
-    @State var plateNumber: String = ""
-    @Environment(\.dismiss) var dismiss
-    @State var selectedVehicleType: String? = nil
+
+    @State private var plateNumber: String = ""
+    @State private var selectedVehicleType: String? = nil
     @State private var textEditorCatatan: String = ""
-    @State private var textEditorCategory: String = ""  // New state for category text field
-    @State private var showNewEntrySheet = false
+    @State private var textEditorCategory: String = ""
     @State private var showScannerSheet = false
-    
+    @FocusState private var focusedField: ForumFields?
+    @Environment(\.dismiss) var dismiss
+
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                // Top Section: Plate Number Form & Camera Button
-                HStack(alignment: .bottom) {
-                    VStack(alignment: .leading) {
-                        Form {
-                            Text("Plat Nomor Kendaraan")
-                                .fontWeight(.bold)
-                            
-                            TextField("Plate Number", text: $plateNumber, prompt: Text("Write your plate number"))
-                                .padding()
-                                .background(Color(UIColor.systemGray5))
-                                .cornerRadius(5)
-                                .autocapitalization(.allCharacters)
+            ScrollView {
+                VStack(spacing: 16) {
+                    plateNumberSection
+                    VehicleTypeChooser(selectedVehicleType: selectedVehicleType)
+                    categorySection
+                    catatanSection
+                }
+                .padding(.bottom, 30)
+                .padding(.top, 16)
+                .navigationTitle("Entry Baru")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button("Cancel") {
+                            dismiss()
+                        }.tint(.blue)
+                    }
+
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button("Save") {
+                            saveEntry()
+                            dismiss()
                         }
+                        .disabled(plateNumber.isEmpty && selectedVehicleType == nil)
+                        .bold()
                     }
-                    .formStyle(.columns)
-                    .padding(.leading, 16)
-                    .padding(.vertical, 16)
-                    
-                    Button {
-                        showScannerSheet = true
-                        print("loading camera")
-                    } label: {
-                        Image(systemName: "camera")
-                            .font(.system(size: 18))
-                            .frame(width: 20, height: 20)
-                            .padding()
-                            .foregroundColor(.blue)
-                            .background(.white)
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 4)
-                                    .stroke(Color.blue)
-                            }
-                    }
-                    .padding([.top, .bottom, .trailing], 16)
+                }
+                .sheet(isPresented: $showScannerSheet) {
+                    PlateScannerView(plateNumber: $plateNumber)
                 }
                 
-                // Middle Section: Choose Vehicle (Motor / Mobil)
-                VehicleTypeChooser(selectedVehicleType: selectedVehicleType)
-                
-                // New Section: Tambahkan Category
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Tambahkan Category")
-                        .fontWeight(.bold)
-                        .multilineTextAlignment(.leading)
-                    
-                    ZStack(alignment: .leading) {
-                        TextField("", text: $textEditorCategory)
-                            .padding(8)
-                        if textEditorCategory.isEmpty {
-                            Text("Tulis category disini")
-                                .foregroundColor(Color(UIColor.systemGray3))
-                                .padding(8)
-                        }
-                    }
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(Color(UIColor.systemGray4), lineWidth: 2)
-                    }
-                }
-                .padding(16)
-                
-                // Bottom Section: Tambahkan Catatan
-                VStack(alignment: .leading, spacing: 16) {
-                    
-                    Text("Tambahkan Catatan")
-                        .fontWeight(.bold)
-                        .multilineTextAlignment(.leading)
-                    
-                    TextEditor(text: $textEditorCatatan)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(Color(UIColor.systemGray4), lineWidth: 2)
-                        }
-                        .font(.subheadline)
-                    
-//                    ZStack(alignment: .topLeading) {
-                        
-//                        if textEditorCatatan.isEmpty {
-//                            Text("Tulis catatan disini")
-//                                .foregroundColor(Color(UIColor.systemGray3))
-//                                .font(.subheadline)
-//                                .padding(.top, 8)
-//                                .padding(.leading, 4)
-//                        }
-//                    }
-                }
-                .padding(16)
-            
-                Spacer() // Ensures content is pushed to the top.
-            }
-            .navigationTitle("Entry Baru")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                // Cancel Button (Top Left)
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .tint(.blue)
-                }
-                
-                // Save Button (Top Right)
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
-                        // Save logic here
-                        
-                        saveEntry()
-                        
-                        dismiss()
-                    }
-                    .disabled(plateNumber.isEmpty && selectedVehicleType == nil)
-                    .bold(true)
-                }
-            }
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(Color(.systemBackground), for: .navigationBar)
-            .sheet(isPresented: $showScannerSheet) {
-                PlateScannerView(plateNumber: $plateNumber)
             }
         }
-        
+        .onTapGesture {
+            focusedField = nil
+        }
     }
-    
+
+    private var plateNumberSection: some View {
+        HStack(alignment: .bottom) {
+            VStack(alignment: .leading) {
+                Form {
+                    Text("Plat Nomor Kendaraan")
+                        .fontWeight(.bold)
+                    TextField("Plate Number", text: $plateNumber)
+                        .focused($focusedField, equals: .plateNumber)
+                        .onSubmit { focusedField = .category }
+                        .padding()
+                        .background(Color(UIColor.systemGray5))
+                        .cornerRadius(5)
+                        .autocapitalization(.allCharacters)
+                }
+            }
+            .formStyle(.columns)
+            .padding(.leading, 16)
+            .padding(.vertical, 16)
+
+            Button {
+                showScannerSheet = true
+            } label: {
+                Image(systemName: "camera")
+                    .font(.system(size: 18))
+                    .frame(width: 20, height: 20)
+                    .padding()
+                    .foregroundColor(.blue)
+                    .background(.white)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 4)
+                            .stroke(Color.blue)
+                    }
+            }
+            .padding([.top, .bottom, .trailing], 16)
+        }
+    }
+
+    private var categorySection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Tambahkan Category")
+                .fontWeight(.bold)
+
+            ZStack(alignment: .leading) {
+                if textEditorCategory.isEmpty {
+                    Text("Tulis category disini")
+                        .foregroundColor(Color(UIColor.systemGray3))
+                        .padding(8)
+                }
+
+                TextField("", text: $textEditorCategory)
+                    .focused($focusedField, equals: .category)
+                    .onSubmit { focusedField = .catetan }
+                    .padding(8)
+            }
+            .overlay(
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(Color(UIColor.systemGray4), lineWidth: 2)
+            )
+        }
+        .padding(16)
+    }
+
+    private var catatanSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Tambahkan Catatan")
+                .fontWeight(.bold)
+
+            ZStack(alignment: .topLeading) {
+                if textEditorCatatan.isEmpty {
+                    Text("Contoh: Komponen Hilang, etc")
+                        .foregroundColor(Color(UIColor.systemGray3))
+                        .padding(12)
+                        .font(.subheadline)
+                }
+
+                TextEditor(text: $textEditorCatatan)
+                    .focused($focusedField, equals: .catetan)
+                    .onSubmit { focusedField = nil }
+                    .font(.subheadline)
+                    .frame(height: 100)
+                    .padding(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(Color(UIColor.systemGray4), lineWidth: 2)
+                    )
+            }
+        }
+        .padding(16)
+    }
+
     private func saveEntry() {
-        
         let trimmedPlate = plateNumber.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-        
+
         if let existingCar = cars.first(where: { $0.plate.uppercased() == trimmedPlate }) {
             let newEntry = Entry(category: existingCar.type, time: Date.now, note: textEditorCatatan)
             existingCar.entry.append(newEntry)
             try? modelContext.save()
-            print("Entry added to car \(existingCar.plate)")
         } else {
-            
-            //TO DISCUSS: normalize data or not
-            let newCar = Car(plate: plateNumber, type: selectedVehicleType ?? "Car")
+            let newCar = Car(plate: trimmedPlate, type: selectedVehicleType ?? "Car")
             let newEntry = Entry(category: textEditorCategory, time: Date.now, note: textEditorCatatan)
-//            if let image = image {
-//                newEntry.image = image.jpegData(compressionQuality: 0.8)
-//            }
             newCar.entry.append(newEntry)
             modelContext.insert(newCar)
             try? modelContext.save()
-            print("New car created and entry added.")
         }
     }
 }
+
 
 
 #Preview {
