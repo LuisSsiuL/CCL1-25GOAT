@@ -21,9 +21,20 @@ struct FilterView: View {
                 
                 DatePicker("End Date", selection: $endDate, displayedComponents: .date)
                     .datePickerStyle(.compact)
-                
-                Toggle("Apply Date Filter", isOn: $isDateFilterActive)
-                    .padding(.top)
+                Button {
+                    // Add new entry logic here.
+                    isDateFilterActive = true
+                    dismiss()
+                } label: {
+                    Text("Apply Filter")
+                        .font(.system(size: 19, weight: .bold, design: .default))
+                        .foregroundStyle(.white)
+                        .frame(width: 330, height: 36, alignment: .center)
+                        .background(Color.blue)
+                        .containerShape(RoundedRectangle(cornerSize: .init(width: 10, height: 10)))
+                }
+//                Toggle("Apply Date Filter", isOn: $isDateFilterActive)
+//                    .padding(.top)
                 
 //                HStack {
 //                    Button("Clear Filter") {
@@ -58,15 +69,16 @@ struct FilterView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                    Button("Clear") {
+                        isDateFilterActive = false
                         dismiss()
                     }
                 }
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
+//                ToolbarItem(placement: .navigationBarLeading) {
+//                    Button("Cancel") {
+//                        dismiss()
+//                    }
+//                }
 
             }
         }
