@@ -2,11 +2,12 @@ import SwiftUI
 import SwiftData
 
 struct AddNewEntryView: View {
-    @State var plateNumber: String = " "
+    
+    @State var plateNumber: String = ""
     @Environment(\.dismiss) var dismiss
-    @State private var selectedVehicle: String? = nil
-    @State private var text = ""
-    @State private var category: String = ""  // New state for category text field
+    @State var selectedVehicleType: String? = nil
+    @State private var textEditorCatatan: String = ""
+    @State private var textEditorCategory: String = ""  // New state for category text field
     @State private var showNewEntrySheet = false
     @State private var showScannerSheet = false
     
@@ -20,7 +21,7 @@ struct AddNewEntryView: View {
                             Text("Plat Nomor Kendaraan")
                                 .fontWeight(.bold)
                             
-                            TextField("Plate Number", text: .constant(""), prompt: Text("Write your plate number"))
+                            TextField("Plate Number", text: $plateNumber, prompt: Text("Write your plate number"))
                                 .padding()
                                 .background(Color(UIColor.systemGray5))
                                 .cornerRadius(5)
@@ -49,53 +50,7 @@ struct AddNewEntryView: View {
                 }
                 
                 // Middle Section: Choose Vehicle (Motor / Mobil)
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Pilih Kendaraan")
-                        .fontWeight(.bold)
-                        .multilineTextAlignment(.leading)
-                    
-                    HStack(spacing: 20) {
-                        VStack(alignment: .leading, spacing: 30) {
-                            Image(systemName: "motorcycle.fill")
-                                .font(.system(size: 30))
-                            Text("Motor")
-                        }
-                        .frame(width: 150, height: 150)
-                        .foregroundColor(selectedVehicle == "Motor" ? .white : Color(UIColor.systemGray3))
-                        .background(selectedVehicle == "Motor" ? .blue : .clear)
-                        .cornerRadius(15)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke(Color(UIColor.systemGray4), lineWidth: 2)
-                        }
-                        .onTapGesture {
-                            withAnimation {
-                                selectedVehicle = (selectedVehicle == "Motor") ? nil : "Motor"
-                            }
-                        }
-                        
-                        VStack(spacing: 30) {
-                            Image(systemName: "car.fill")
-                                .font(.system(size: 30))
-                            Text("Mobil")
-                        }
-                        .frame(width: 150, height: 150)
-                        .foregroundColor(selectedVehicle == "Mobil" ? .white : Color(UIColor.systemGray3))
-                        .background(selectedVehicle == "Mobil" ? .blue : .clear)
-                        .cornerRadius(15)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke(Color(UIColor.systemGray4), lineWidth: 2)
-                        }
-                        .onTapGesture {
-                            withAnimation {
-                                selectedVehicle = (selectedVehicle == "Mobil") ? nil : "Mobil"
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 25)
-                }
-                .padding(16)
+                VehicleTypeChooser(selectedVehicleType: selectedVehicleType)
                 
                 // New Section: Tambahkan Category
                 VStack(alignment: .leading, spacing: 16) {
@@ -104,9 +59,9 @@ struct AddNewEntryView: View {
                         .multilineTextAlignment(.leading)
                     
                     ZStack(alignment: .leading) {
-                        TextField("", text: $category)
+                        TextField("", text: $textEditorCategory)
                             .padding(8)
-                        if category.isEmpty {
+                        if textEditorCategory.isEmpty {
                             Text("Tulis category disini")
                                 .foregroundColor(Color(UIColor.systemGray3))
                                 .padding(8)
@@ -126,13 +81,13 @@ struct AddNewEntryView: View {
                         .multilineTextAlignment(.leading)
                     
                     ZStack(alignment: .topLeading) {
-                        TextEditor(text: $text)
+                        TextEditor(text: $textEditorCatatan)
                             .overlay {
                                 RoundedRectangle(cornerRadius: 6)
                                     .stroke(Color(UIColor.systemGray4), lineWidth: 2)
                             }
                             .font(.subheadline)
-                        if text.isEmpty {
+                        if textEditorCatatan.isEmpty {
                             Text("Tulis catatan disini")
                                 .foregroundColor(Color(UIColor.systemGray3))
                                 .font(.subheadline)
@@ -143,7 +98,6 @@ struct AddNewEntryView: View {
                 }
                 .padding(16)
             
-                
                 Spacer() // Ensures content is pushed to the top.
             }
             .navigationTitle("Entry Baru")
@@ -161,6 +115,9 @@ struct AddNewEntryView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
                         // Save logic here
+                        
+                        
+                        
                         dismiss()
                     }
                     .bold(true)
@@ -178,4 +135,59 @@ struct AddNewEntryView: View {
 
 #Preview {
     AddNewEntryView()
+}
+
+struct VehicleTypeChooser: View {
+    
+    @State var selectedVehicleType: String?
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Pilih Kendaraan")
+                .fontWeight(.bold)
+                .multilineTextAlignment(.leading)
+            
+            HStack(spacing: 20) {
+                VStack(alignment: .leading, spacing: 30) {
+                    Image(systemName: "motorcycle.fill")
+                        .font(.system(size: 30))
+                    Text("Motor")
+                }
+                .frame(width: 150, height: 150)
+                .foregroundColor(selectedVehicleType == "Motor" ? .white : Color(UIColor.systemGray3))
+                .background(selectedVehicleType == "Motor" ? .blue : .clear)
+                .cornerRadius(15)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 15)
+                        .stroke(Color(UIColor.systemGray4), lineWidth: 2)
+                }
+                .onTapGesture {
+                    withAnimation {
+                        selectedVehicleType = (selectedVehicleType == "Motor") ? nil : "Motor"
+                    }
+                }
+                
+                VStack(spacing: 30) {
+                    Image(systemName: "car.fill")
+                        .font(.system(size: 30))
+                    Text("Mobil")
+                }
+                .frame(width: 150, height: 150)
+                .foregroundColor(selectedVehicleType == "Mobil" ? .white : Color(UIColor.systemGray3))
+                .background(selectedVehicleType == "Mobil" ? .blue : .clear)
+                .cornerRadius(15)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 15)
+                        .stroke(Color(UIColor.systemGray4), lineWidth: 2)
+                }
+                .onTapGesture {
+                    withAnimation {
+                        selectedVehicleType = (selectedVehicleType == "Mobil") ? nil : "Mobil"
+                    }
+                }
+            }
+            .padding(.horizontal, 25)
+        }
+        .padding(16)
+    }
 }
