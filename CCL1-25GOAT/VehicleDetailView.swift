@@ -299,23 +299,23 @@ struct VehicleDetailView: View {
                     .presentationDetents([.fraction(0.5)])
             }
             .alert("Hapus Kendaraan?", isPresented: $showDeleteAlert) {
-                Button("Batal", role: .cancel) {}
                 Button("Hapus", role: .destructive) {
                     // Delete logic would go here
                     deleteVehicle(vehicle: vehicle)
                     isDeleted = true
                     dismiss()
                 }
+                Button("Batal", role: .cancel) {}
             } message: {
                 Text("Apakah anda yakin ingin menghapus data kendaraan ini?")
             }
             .alert(isPresented: $isLastEntry) {
-                Alert(title: Text("Hapus Catatan"), message: Text("Catatan ini adalah satu-satunya data untuk kendaraan ini. Menghapusnya berarti seluruh informasi kendaraan akan ikut terhapus. Tetap lanjutkan?"), primaryButton: .default(Text("Lanjut"), action: {
+                Alert(title: Text("Hapus Catatan"), message: Text("Catatan ini adalah satu-satunya data untuk kendaraan ini. Menghapusnya berarti seluruh informasi kendaraan akan ikut terhapus. Tetap lanjutkan?"), primaryButton: .cancel(Text("Batal")), secondaryButton: .destructive(Text("Lanjut"), action: {
                     
                     deleteVehicle(vehicle: vehicle)
                     dismiss()
                     
-                }), secondaryButton: .cancel(Text("Batal")))
+                }))
             }
     }
     
