@@ -55,7 +55,7 @@ struct PlateScannerView: View {
                 }
                 .toolbar {
                     ToolbarItem(placement: .principal) {
-                        Text("Pemindai Plat").font(.headline).foregroundStyle(Color.white)
+                     
                     }
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button {

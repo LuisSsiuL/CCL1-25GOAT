@@ -275,7 +275,7 @@ struct VehicleDetailView: View {
                     } label: {
                         Text("+ Tambahkan Catatan Baru").font(.system(size: 19, weight: .bold, design: .default))
                             .foregroundStyle(.white)
-                            .frame(width: 330, height: 36, alignment: .center)
+                            .frame(width: 330, height: 44, alignment: .center)
                             .background(Color.blue)
                             .containerShape(RoundedRectangle(cornerSize: .init(width: 10, height: 10)))
                     }

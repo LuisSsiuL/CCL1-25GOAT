@@ -144,7 +144,7 @@ struct DashboardView: View {
                             Text("Pindai Plat Nomor")
                                 .font(.system(size: 19, weight: .bold, design: .default))
                                 .foregroundStyle(.white)
-                                .frame(width: 360, height: 36, alignment: .center)
+                                .frame(width: 360, height: 44, alignment: .center)
                                 .background(Color.blue)
                                 .containerShape(RoundedRectangle(cornerSize: .init(width: 10, height: 10)))
                         }
@@ -165,7 +165,7 @@ struct DashboardView: View {
                         Text("+ Tambah Catatan Baru")
                             .font(.system(size: 19, weight: .bold, design: .default))
                             .foregroundStyle(.white)
-                            .frame(width: 330, height: 36, alignment: .center)
+                            .frame(width: 330, height: 44, alignment: .center)
                             .background(Color.blue)
                             .containerShape(RoundedRectangle(cornerSize: .init(width: 10, height: 10)))
                     }
@@ -176,7 +176,7 @@ struct DashboardView: View {
                 // Principal title remains unchanged.
                 ToolbarItem(placement: .principal) {
                     Text("Dashboard")
-                        .font(.system(size: 20, weight: .bold, design: .default))
+                        .font(.system(size: 18, weight: .bold, design: .default))
                         .foregroundStyle(.black)
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
