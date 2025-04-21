@@ -157,7 +157,7 @@ struct AddNewEntryView: View {
         let trimmedPlate = plateNumber.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
 
         if let existingCar = cars.first(where: { $0.plate.uppercased() == trimmedPlate }) {
-            let newEntry = Entry(category: existingCar.type, time: Date.now, note: textEditorCatatan)
+            let newEntry = Entry(category: textEditorCategory, time: Date.now, note: textEditorCatatan)
             existingCar.entry.append(newEntry)
             try? modelContext.save()
         } else {

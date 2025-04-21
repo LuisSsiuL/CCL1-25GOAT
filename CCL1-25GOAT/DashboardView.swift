@@ -4,6 +4,7 @@ import SwiftData
 // MARK: - GroupedCarList
 
 struct GroupedCarList: View {
+    
     let car: [Car]
     
     private var groupedCar: [Date: [Car]] {
@@ -156,6 +157,7 @@ struct DashboardView: View {
                     .transition(.move(edge: .top))
                     .animation(.easeInOut, value: isSearching)
                 } else {
+                    VehicleTypeFilterView(filterVehicleType: $filterVehicleType)
                     GroupedCarList(car: carsFilter)
                         .scrollContentBackground(.hidden)
                     Button {
@@ -179,14 +181,7 @@ struct DashboardView: View {
                         .font(.system(size: 18, weight: .bold, design: .default))
                         .foregroundStyle(.black)
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        showFilterSheet = true
-                    } label: {
-                        Image(systemName: "line.3.horizontal.decrease.circle")
-                            .foregroundStyle(Color.blue)
-                    }
-                }
+
             }
             .background(.ultraThinMaterial)
             .navigationBarTitleDisplayMode(.inline)
@@ -201,10 +196,6 @@ struct DashboardView: View {
         .fullScreenCover(isPresented: $showScannerSheet){
             PlateScannerView(plateNumber: $searchText)
                
-        }
-        .sheet(isPresented: $showFilterSheet) {
-            VehicleTypeFilterView(filterVehicleType: $filterVehicleType)
-                .presentationDetents([.fraction(0.21)])
         }
     }
 }
