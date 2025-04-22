@@ -4,19 +4,11 @@ struct VehicleDetailCard: View {
     let entry: Entry
 
     var body: some View {
-        VStack {
-            
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
-                if let imageData = entry.image, let uiImage = UIImage(data: imageData) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .frame(width: 50, height: 50)
-                        .cornerRadius(8)
-                }
-                
                 VStack(alignment: .leading) {
                     Text(entry.category)
-                        .font(.subheadline)
+                        .font(.headline)
                         .bold()
                     if !entry.note.isEmpty {
                         Text(entry.note)
@@ -26,9 +18,21 @@ struct VehicleDetailCard: View {
                 }
                 Spacer()
                 Text(entry.time.formatted(date: .omitted, time: .shortened))
-                
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            
+            // Display image if available
+            if let imageData = entry.image, let uiImage = UIImage(data: imageData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(maxWidth: .infinity)
+                    .cornerRadius(12)
+                    .clipped()
             }
         }
+        .padding(.vertical, 8)
     }
 }
 
@@ -296,7 +300,7 @@ struct VehicleDetailView: View {
             }
             .sheet(isPresented: $showAddNoteSheet) {
                 VehicleAddNoteView(selectedVehicle: vehicle)
-                    .presentationDetents([.fraction(0.5)])
+                    .presentationDetents([.fraction(0.8)])
             }
             .alert("Hapus Kendaraan?", isPresented: $showDeleteAlert) {
                 Button("Hapus", role: .destructive) {
